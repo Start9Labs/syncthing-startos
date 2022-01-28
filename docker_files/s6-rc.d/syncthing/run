@@ -1,0 +1,11 @@
+#!/bin/sh
+su syncthing_user
+export HOME=/root
+syncthing serve --no-restart &
+syncthing_process=$!
+while [[ "$(syncthing cli show system)" =~ 'no such file or directory' ]] || [[ "$(syncthing cli show system)" =~ 'connection refused' ]] ; do
+  sleep .2
+done
+
+syncthing cli config gui raw-address set -- 0.0.0.0:8384
+wait "$syncthing_process"
