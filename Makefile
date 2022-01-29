@@ -20,10 +20,8 @@ verify: syncthing.s9pk
 image.tar: Dockerfile templates
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/syncthing/main:${EMVER} --platform=linux/arm64/v8 -o type=docker,dest=image.tar .
 
-entrypoint.sh:
-	tiny-tmpl manifest.yaml < docker_files/entrypoint.sh.template > docker_files/entrypoint.sh
 
-templates: entrypoint.sh
+templates: 
 
 manifest.yaml:
 	yq eval -i ".version = \"$(VERSION)\"" manifest.yaml
