@@ -14,23 +14,22 @@ release-notes: Initial release.
 main:
   type: docker
   image: main
-  entrypoint: /init
-  args: []
+  entrypoint: tini
+  args: ["entrypoint.sh"]
   mounts:
     main: /root
   io-format: yaml
 health-checks:
-  {}
-  # version:
-  #   name: Version
-  #   description: Make sure that syncthing is installed
+  version:
+    name: Version
+    description: Make sure that syncthing is installed
 
-  #   type: docker
-  #   image: main
-  #   entrypoint: sh
-  #   args: ["-c", "syncthing --version || exit 1"]
-  #   io-format: yaml
-  #   inject: true
+    type: docker
+    image: main
+    entrypoint: sh
+    args: ["-c", "syncthing cli config version get || exit 1"]
+    io-format: yaml
+    inject: true
 volumes:
   main:
     type: data
