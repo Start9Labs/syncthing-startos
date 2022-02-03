@@ -3,11 +3,11 @@
 # export HOME=/root
 su -s /bin/sh -c "syncthing serve --no-restart" syncthing_user &
 syncthing_process=$!
-su -c /bin/sh syncthing_user
+# su -c /bin/sh syncthing_user
+export HOME=/home/syncthing_user
 while [[ "$(syncthing cli show system)" =~ 'no such file or directory' ]] || [[ "$(syncthing cli show system)" =~ 'connection refused' ]] || [[ "$(syncthing cli config gui user get)" =~ 'connection refused' ]]; do
   sleep .2
 done
-export HOME=/home-syncthing_user
 echo "Syncthing Settings"
 syncthing cli config gui raw-address set -- 0.0.0.0:8384
 sleep .1

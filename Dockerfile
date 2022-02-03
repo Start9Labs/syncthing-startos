@@ -12,7 +12,11 @@ RUN apk add --no-cache tini
 RUN adduser --disabled-password syncthing_user
 
 COPY docker_files/entrypoint.sh /usr/local/bin/entrypoint.sh
+EXPOSE 8384/tcp
+EXPOSE 22000/tcp
 
+EXPOSE 8384/udp
+EXPOSE 22000/udp
 
 ENTRYPOINT ["tini"]
 

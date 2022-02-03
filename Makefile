@@ -11,7 +11,7 @@ all: verify
 install: syncthing.s9pk
 	embassy-cli package install syncthing.s9pk
 
-syncthing.s9pk: manifest.yaml image.tar INSTRUCTIONS.md LICENSE.md $(ASSET_PATHS)
+syncthing.s9pk: manifest.yaml image.tar INSTRUCTIONS.md LICENSE $(ASSET_PATHS)
 	embassy-sdk pack
 	
 verify: syncthing.s9pk

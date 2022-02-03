@@ -8,12 +8,14 @@ docker build -t sync . --load && docker run -it -p 8385:8384  --rm --name sync  
 
 scp -o ProxyJump=ThinClient syncthing.s9pk BluePi:/tmp # Proxy search
 ssh -J ThinClient BluePi # Proxy through thin to blupi
+ssh -J ThinClient BluePi -c "docker exec -it syncthing.embassy /bin/sh" # Proxy through thin to blupi Syncthing
 
+make && scp -o ProxyJump=ThinClient syncthing.s9pk BluePi:/tmp # Proxy search
 
 scp syncthing.s9pk BluePi:/tmp # Proxy search
 ssh BluePi # Proxy through thin to blupi
 
 embassy-cli auth login
-embassy-cli package install syncthing.s9pk
+embassy-cli package uninstall syncthing; embassy-cli package install syncthing.s9pk
 
 ```
