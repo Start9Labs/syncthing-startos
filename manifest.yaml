@@ -60,7 +60,7 @@ interfaces:
     description: Approve folder and users from ui
     tor-config:
       port-mapping:
-        8384: "80"
+        80: "8384"
     lan-config:
       8384:
         ssl: true
@@ -69,6 +69,7 @@ interfaces:
     protocols:
       - tcp
       - udp
+      - http
 
   sync-listening:
     name: Listening Port
@@ -84,6 +85,7 @@ interfaces:
     protocols:
       - tcp
       - udp
+      - http
 alerts: {}
 backup:
   create:
