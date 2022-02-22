@@ -15,7 +15,7 @@ syncthing.s9pk: manifest.yaml image.tar INSTRUCTIONS.md LICENSE $(ASSET_PATHS)
 	embassy-sdk pack
 	
 verify: syncthing.s9pk
-	embassy-sdk verify syncthing.s9pk
+	embassy-sdk verify s9pk syncthing.s9pk
 
 image.tar: Dockerfile templates
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/syncthing/main:${EMVER} --platform=linux/arm64/v8 -o type=docker,dest=image.tar .

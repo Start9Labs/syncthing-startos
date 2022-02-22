@@ -11,9 +11,9 @@ done
 echo "Syncthing Settings"
 syncthing cli config gui raw-address set -- 0.0.0.0:8384
 sleep .1
-syncthing cli config gui user set -- admin
+syncthing cli config gui user set -- $(yq eval '.username' /root/start9/config.yaml)
 sleep .1
-syncthing cli config gui password set -- test123
+syncthing cli config gui password set -- $(yq eval '.password' /root/start9/config.yaml)
 sleep .1
 syncthing cli config options uraccepted set -- -1
 
