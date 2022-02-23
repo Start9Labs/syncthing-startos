@@ -1,2 +1,5 @@
 image.tar
 syncthing.s9pk
+**/node_modules/
+makeStats
+stats/target

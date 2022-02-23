@@ -10,7 +10,7 @@ scp -o ProxyJump=ThinClient syncthing.s9pk BluePi:/tmp # Proxy search
 ssh -J ThinClient BluePi # Proxy through thin to blupi
 ssh -J ThinClient BluePi -c "docker exec -it syncthing.embassy /bin/sh" # Proxy through thin to blupi Syncthing
 
-make && scp syncthing.s9pk BluePi:/tmp # Proxy search
+make; scp syncthing.s9pk BluePi:/tmp # Proxy search
 
 scp syncthing.s9pk BluePi:/tmp # Proxy search
 ssh BluePi # Proxy through thin to blupi

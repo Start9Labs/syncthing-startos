@@ -26,6 +26,7 @@ main:
   args: ["entrypoint.sh"]
   mounts:
     main: /root
+    filebrowser: /mnt/filebrowser
   io-format: yaml
 health-checks:
   version:
@@ -35,7 +36,7 @@ health-checks:
     type: docker
     image: main
     entrypoint: sh
-    args: ["-c", "HOME=/home/syncthing_user syncthing cli config version get || exit 1"]
+    args: ["-c", "HOME=/root/syncthing syncthing cli config version get || exit 1"]
     io-format: yaml
     inject: true
 config:
@@ -87,6 +88,7 @@ properties:
     - /root
   mounts:
     main: /root
+    compat: "/mnt/assets"
   io-format: yaml
 dependencies:
   # Key must be the package id of another service that exists in the marketplace
@@ -106,6 +108,12 @@ dependencies:
     # This is a list of rules that levies requirements on the configuration of the dependency and suggests ways to remedy any incompatibilities. Documentation of this feature is outside the scope of this example.
     config: ~
 volumes:
+  filebrowser:
+    package-id: "filebrowser"
+    path: "data"
+    readonly: false
+    type: "pointer"
+    volume-id: "main"
   compat:
     type: assets
   main:
@@ -123,12 +131,6 @@ interfaces:
         80: "8384"
     # Port mappings are from the external port to the internal container port
     lan-config:
-      80:
-        ssl: false
-        internal: 8384
-      8384:
-        ssl: false
-        internal: 8384
       443:
         ssl: true
         internal: 8384

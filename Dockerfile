@@ -13,6 +13,9 @@ RUN apk add --no-cache yq
 RUN adduser --disabled-password syncthing_user
 
 COPY docker_files/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+COPY stats/target/aarch64-unknown-linux-musl/release/stats /usr/bin
+
 EXPOSE 8384/tcp
 EXPOSE 22000/tcp
 
