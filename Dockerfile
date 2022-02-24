@@ -6,7 +6,7 @@ FROM alpine:3.15
 # ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz /tmp
 # RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz
 
-RUN apk add --no-cache syncthing
+RUN apk add --no-cache syncthing=1.18.4-r1
 RUN apk add --no-cache tini
 RUN apk add --no-cache yq
 
