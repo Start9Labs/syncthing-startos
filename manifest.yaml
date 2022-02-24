@@ -12,8 +12,7 @@ min-os-version: "0.3.0"
 description:
   short: Simple cloud data storage and sharing
   long: |
-    Syncthing provides a simple file managing interface which can be used to upload, download, organize, edit, and share your files.
-    It allows the creation of multiple users and each user can have their own directory.
+    Syncthing provides a simple file managing and synchronization interface which can be used to upload, download, organize, edit, and share your files across multiple devices.
 assets:
   license: LICENSE
   icon: icon.png
@@ -32,7 +31,6 @@ health-checks:
   version:
     name: Version
     description: Make sure that syncthing is installed
-
     type: docker
     image: main
     entrypoint: sh
@@ -102,9 +100,9 @@ dependencies:
       # "Opt-out" means the dependency will be required according to the default config. "Opt-in" means the dependency may be required if you change the config. And "required" just means it's always required.
       type: "opt-out"
       # An explanation of how to opt-in or opt-out. This value is optional for type=required
-      how: Optionally use the selected dependency
+      how: Optionally use Filebrowser as a dependency
     # Description of the dependency relationship
-    description: A dependency that demonstrates the way to configure a dependent service
+    description: Used to store persisted data for Syncthing
     # This is a list of rules that levies requirements on the configuration of the dependency and suggests ways to remedy any incompatibilities. Documentation of this feature is outside the scope of this example.
     config: ~
 volumes:
@@ -124,7 +122,7 @@ interfaces:
     # A human readable name for display in the UI
     name: Syncthing UI
     # A descriptive description of what the interface does
-    description: Approve folder and users from ui
+    description: The user interface to configure, customize, and interact with Syncthing
     tor-config:
       # Port mappings are from the external port to the internal container port
       port-mapping:
@@ -140,7 +138,6 @@ interfaces:
     protocols:
       - tcp
       - http
-
   sync-listening:
     name: Listening Port
     description: Listening Port
