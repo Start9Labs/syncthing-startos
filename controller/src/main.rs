@@ -6,7 +6,14 @@ use std::{
 
 use maplit::hashmap;
 use serde::{Deserialize, Serialize};
+use structopt::StructOpt;
 
+#[derive(StructOpt)]
+#[structopt(about = "the stupid content tracker")]
+enum Opt {
+    CreateStats,
+    EntryPoint,
+}
 #[derive(Debug, Deserialize)]
 struct SyncthingSystem {
     #[serde(rename = "myID")]
@@ -20,8 +27,8 @@ struct Stats {
 }
 #[derive(Debug, Serialize)]
 struct StatsData {
-    r#type: String,
-    name: String,
+    #[serde(rename = "type")]
+    value_type: String,
     value: String,
     description: String,
     copyable: bool,
@@ -29,6 +36,15 @@ struct StatsData {
     masked: bool,
 }
 fn main() {
+    let opt = Opt::from_args();
+
+    match opt {
+        Opt::CreateStats => create_stats(),
+        Opt::EntryPoint => entry_point(),
+    }
+}
+
+fn create_stats() {
     let child = Command::new("syncthing")
         .args(&["cli", "show", "system"])
         .stdout(Stdio::piped())
@@ -41,8 +57,7 @@ fn main() {
         version: 2,
         data: hashmap! {
             "id".to_string() => StatsData{
-                r#type: "string".to_string(),
-                name: "id".to_string(),
+                value_type: "string".to_string(),
                 value: syncthing_system.my_id,
                 description: "his is the ID for syncthing to attach others to".to_string(),
                 copyable: true,
@@ -55,3 +70,5 @@ fn main() {
     let file = File::create("/root/start9/stats.yaml").unwrap();
     serde_yaml::to_writer(file, &stats).unwrap();
 }
+
+fn entry_point() {}

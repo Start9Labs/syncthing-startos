@@ -36,7 +36,7 @@ health-checks:
     type: docker
     image: main
     entrypoint: sh
-    args: ["-c", "HOME=/root/syncthing syncthing cli config version get || exit 1"]
+    args: ["-c", "HOME=/mnt/filebrowser/syncthing syncthing cli config version get || exit 1"]
     io-format: yaml
     inject: true
 config:
