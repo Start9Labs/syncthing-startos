@@ -1,7 +1,7 @@
 id: syncthing
 title: "Syncthing"
 version: 1.18.4
-release-notes: "Upgrade to EmbassyOS v0.3.0"
+release-notes: "https://github.com/syncthing/syncthing/releases/tag/v1.18.4"
 license: apache
 wrapper-repo: "https://github.com/Start9Labs/syncthing-wrapper"
 upstream-repo: "https://github.com/syncthing/syncthing"
@@ -15,7 +15,7 @@ description:
     Syncthing provides a simple file managing and synchronization interface which can be used to upload, download, organize, edit, and share your files across multiple devices.
 assets:
   license: LICENSE
-  icon: icon.png
+  icon: icon.svg
   instructions: INSTRUCTIONS.md
   docker-images: image.tar
 main:
@@ -36,6 +36,17 @@ health-checks:
     entrypoint: sh
     args: ["-c", "HOME=/mnt/filebrowser/syncthing syncthing cli config version get || exit 1"]
     io-format: yaml
+    inject: true
+
+  web-ui:
+    name: Web Interface
+    description: Syncthing has a web ui where all the confirmations, and per folder and device configurations lie.
+    success-message: Syncthing is ready to be visited in your browser.
+    type: docker
+    image: main
+    entrypoint: health-check.sh
+    args: ["web"]
+    io-format: json
     inject: true
 config:
   # The config action to run to get the specified config file (default is config.yaml)
@@ -185,19 +196,3 @@ backup:
       BACKUP: /mnt/backup
       main: /root/data
     io-format: yaml
-actions:
-  reset-root-user:
-    name: Reset Root User
-    description: Resets your root user (the first user) to username "admin" and a random password; restores any lost admin privileges.
-    warning: This will invalidate existing sessions and password managers if you have them set up.
-    allowed-statuses:
-      - stopped
-    implementation:
-      type: docker
-      image: main
-      system: false
-      entrypoint: docker_entrypoint.sh
-      args: ["reset-root-user"]
-      mounts:
-        main: /root
-      io-format: json

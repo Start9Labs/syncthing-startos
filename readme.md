@@ -1,21 +1,34 @@
+# Wrapper for Syncthing
+
+## Dependencies
+
+- [docker](https://docs.docker.com/get-docker)
+- [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
+- [yq](https://mikefarah.gitbook.io/yq)
+- [tiny-tmpl](https://github.com/Start9Labs/templating-engine-rs.git)
+- [backend](https://github.com/Start9Labs/embassy-os/tree/master/backend)
+
+## Cloning
+
+```
+git clone git@github.com:Start9Labs/syncthing-wrapper.git
+cd syncthing-wrapper
+```
+
+## Building
+
+```
+make
+```
+
+## Installing (on Embassy)
+
+After one has built the s9pk, copy this c9pk into the embassy for side loading, which we shall call Embassy.Could be Created in ~/.ssh/config.
+Then on the device, we probably need to login, then followed by installing it.
+
 ```sh
-
-docker build -t sync . --load # Build a sync image
-docker run -it -p 8385:8384  --rm --name sync sync # Run container and call it sync with ports 80 and 3001 opened
-docker exec -it sync /bin/sh # Go into test
-
-docker build -t sync . --load && docker run -it -p 8385:8384  --rm --name sync  sync
-
-scp -o ProxyJump=ThinClient syncthing.s9pk BluePi:/tmp # Proxy search
-ssh -J ThinClient BluePi # Proxy through thin to blupi
-ssh -J ThinClient BluePi -c "docker exec -it syncthing.embassy /bin/sh" # Proxy through thin to blupi Syncthing
-
-make; scp syncthing.s9pk BluePi:/tmp # Proxy search
-
-scp syncthing.s9pk BluePi:/tmp # Proxy search
-ssh BluePi # Proxy through thin to blupi
-
-embassy-cli auth login
-embassy-cli package uninstall syncthing; embassy-cli package install syncthing.s9pk
-
+scp syncthing.s9pk Embassy:/tmp # Copying our file across
+ssh Embassy # Going into embassy
+embassy-cli auth login # Login to the system
+embassy-cli package install syncthing.s9pk # Install the sideloaded package
 ```
