@@ -9,6 +9,7 @@ FROM alpine:3.15
 RUN apk add --no-cache syncthing=1.18.4-r1
 RUN apk add --no-cache tini
 RUN apk add --no-cache yq
+RUN apk add --no-cache curl
 
 RUN adduser --disabled-password syncthing_user
 
