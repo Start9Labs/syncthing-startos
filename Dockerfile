@@ -16,7 +16,8 @@ RUN adduser --disabled-password syncthing_user
 COPY docker_files/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 COPY controller/target/aarch64-unknown-linux-musl/release/controller /usr/bin
-COPY health-check.sh /usr/bin
+COPY docker_files/health-check.sh /usr/bin
+COPY docker_files/watch-and-own.sh /usr/bin
 
 EXPOSE 8384/tcp
 EXPOSE 22000/tcp

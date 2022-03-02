@@ -26,4 +26,6 @@ syncthing cli config defaults device introducer set true
 
 controller create-stats
 
+watch-and-own.sh &
+
 wait -n

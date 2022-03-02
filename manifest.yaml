@@ -29,8 +29,8 @@ main:
   io-format: yaml
 health-checks:
   version:
-    name: Version
-    description: Make sure that syncthing is installed
+    name: Sync Connection
+    description: Syncthing is running and connected with filebrowser folder
     type: docker
     image: main
     entrypoint: sh
