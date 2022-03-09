@@ -1,7 +1,7 @@
 id: syncthing
 title: "Syncthing"
-version: 1.18.4
-release-notes: "https://github.com/syncthing/syncthing/releases/tag/v1.18.4"
+version: 1.19.1
+release-notes: "https://github.com/syncthing/syncthing/releases/tag/v1.19.1"
 license: apache
 wrapper-repo: "https://github.com/Start9Labs/syncthing-wrapper"
 upstream-repo: "https://github.com/syncthing/syncthing"
