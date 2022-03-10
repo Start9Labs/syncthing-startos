@@ -62,7 +62,7 @@ fn create_stats() {
     let stats = Stats {
         version: 2,
         data: hashmap! {
-            "id".to_string() => StatsData{
+            "Device ID".to_string() => StatsData{
                 value_type: "string".to_string(),
                 value: syncthing_system.my_id,
                 description: "his is the ID for syncthing to attach others to".to_string(),
@@ -70,7 +70,7 @@ fn create_stats() {
                 qr: true,
                 masked: false,
             },
-            "username".to_string() => StatsData{
+            "Username".to_string() => StatsData{
                 value_type: "string".to_string(),
                 value: username,
                 description: "Username to login to the UI".to_string(),
@@ -78,7 +78,7 @@ fn create_stats() {
                 qr: false,
                 masked: false,
             },
-            "password".to_string() => StatsData{
+            "Password".to_string() => StatsData{
                 value_type: "string".to_string(),
                 value: password,
                 description: "Password to login to the UI".to_string(),
