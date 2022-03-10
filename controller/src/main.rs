@@ -3,7 +3,6 @@ use std::{
     process::{Command, Stdio},
 };
 
-use imbl::{ordmap, OrdMap};
 use serde::{Deserialize, Serialize};
 use structopt::StructOpt;
 
@@ -26,11 +25,22 @@ struct Start9Config {
 
 #[derive(Debug, Serialize)]
 struct Stats {
-    data: OrdMap<String, StatsData>,
+    data: StatsData,
     version: u64,
 }
+
 #[derive(Debug, Serialize, Clone)]
 struct StatsData {
+    #[serde(rename = "Device ID")]
+    id: StatsDataType,
+    #[serde(rename = "Username")]
+    username: StatsDataType,
+    #[serde(rename = "Password")]
+    password: StatsDataType,
+}
+
+#[derive(Debug, Serialize, Clone)]
+struct StatsDataType {
     #[serde(rename = "type")]
     value_type: String,
     value: String,
@@ -60,8 +70,8 @@ fn create_stats() {
 
     let stats = Stats {
         version: 2,
-        data: ordmap! {
-            "Device ID".to_string() => StatsData{
+        data: StatsData {
+            id: StatsDataType {
                 value_type: "string".to_string(),
                 value: syncthing_system.my_id,
                 description: "his is the ID for syncthing to attach others to".to_string(),
@@ -69,7 +79,7 @@ fn create_stats() {
                 qr: true,
                 masked: false,
             },
-            "Username".to_string() => StatsData{
+            username: StatsDataType {
                 value_type: "string".to_string(),
                 value: username,
                 description: "Username to login to the UI".to_string(),
@@ -77,14 +87,14 @@ fn create_stats() {
                 qr: false,
                 masked: false,
             },
-            "Password".to_string() => StatsData{
+            password: StatsDataType {
                 value_type: "string".to_string(),
                 value: password,
                 description: "Password to login to the UI".to_string(),
                 copyable: true,
                 qr: false,
                 masked: true,
-            }
+            },
         },
     };
 

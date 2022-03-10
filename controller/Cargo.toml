@@ -8,7 +8,6 @@ edition = "2021"
 [dependencies]
 serde_json = "1.0"
 serde_yaml = "0.8"
-imbl = {version = "1.0.1", features = ["serde"]}
 structopt = "0.3"
 
 [dependencies.serde]
