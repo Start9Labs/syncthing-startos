@@ -2,7 +2,7 @@ VERSION_TAG := $(shell git describe --abbrev=0 --tags)
 VERSION := $(VERSION_TAG:v%=%)
 EMVER := $(shell yq e ".version" manifest.yaml)
 
-SYNCTHING_VERSION := "v1.18.4"
+SYNCTHING_VERSION := "v1.19.1"
 
 .DELETE_ON_ERROR:
 
