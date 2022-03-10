@@ -23,6 +23,10 @@ syncthing cli config options uraccepted set -- -1
 syncthing cli config defaults device auto-accept-folders set true
 syncthing cli config defaults device introducer set true
 
+while [[ "$(syncthing cli show system)" =~ 'no such file or directory' ]] || [[ "$(syncthing cli show system)" =~ 'connection refused' ]] || [[ "$(syncthing cli config gui user get)" =~ 'connection refused' ]]; do
+  sleep .2
+  echo "I'm sleeping"
+done
 
 controller create-stats
 
