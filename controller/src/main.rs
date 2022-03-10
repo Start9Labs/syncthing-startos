@@ -1,10 +1,9 @@
 use std::{
-    collections::HashMap,
     fs::File,
     process::{Command, Stdio},
 };
 
-use maplit::hashmap;
+use imbl::{ordmap, OrdMap};
 use serde::{Deserialize, Serialize};
 use structopt::StructOpt;
 
@@ -27,10 +26,10 @@ struct Start9Config {
 
 #[derive(Debug, Serialize)]
 struct Stats {
-    data: HashMap<String, StatsData>,
+    data: OrdMap<String, StatsData>,
     version: u64,
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 struct StatsData {
     #[serde(rename = "type")]
     value_type: String,
@@ -61,7 +60,7 @@ fn create_stats() {
 
     let stats = Stats {
         version: 2,
-        data: hashmap! {
+        data: ordmap! {
             "Device ID".to_string() => StatsData{
                 value_type: "string".to_string(),
                 value: syncthing_system.my_id,
@@ -85,7 +84,7 @@ fn create_stats() {
                 copyable: true,
                 qr: false,
                 masked: true,
-            },
+            }
         },
     };
 
