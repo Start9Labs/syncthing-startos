@@ -15,7 +15,7 @@ description:
     Syncthing provides a simple file managing and synchronization interface which can be used to upload, download, organize, edit, and share your files across multiple devices.
 assets:
   license: LICENSE
-  icon: icon.svg
+  icon: icon.png
   instructions: INSTRUCTIONS.md
   docker-images: image.tar
 main:
@@ -196,3 +196,18 @@ backup:
       BACKUP: /mnt/backup
       main: /root/data
     io-format: yaml
+actions:
+  permissions:
+    name: Reset File Permissions
+    description: The syncthing uses a smaller set of permission in the file browser for security. Since there are other users that can create permissions that it can't access it is necessary to force ownsership.
+    # Indicates what state the service can be in while executing the action
+    allowed-statuses:
+      - running
+    # Defines how the action is run
+    implementation:
+      type: docker
+      image: main
+      entrypoint: force-own.sh
+      args: []
+      inject: true
+      io-format: json
