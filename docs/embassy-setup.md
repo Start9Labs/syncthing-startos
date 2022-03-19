@@ -35,7 +35,11 @@ That's it, you have a folder with pictures, ready to sync to other devices!
 See the following guides for each device you would like to setup:
 
 [Linux](./linux.md)
+
 [MacOS](./macos.md)
+
 [Windows](./windows.md)
+
 [Android](./android.md)
+
 [iOS](./ios.md)
