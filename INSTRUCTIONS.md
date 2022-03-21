@@ -8,4 +8,4 @@
 
 4. Optionally change your default username/password.
 
-For full walkthrough guides by Device type, please visit: https://github.com/Start9Labs/syncthing-wrapper/docs/embassy-setup.md
+For full walkthrough guides by Device type, please visit: https://github.com/Start9Labs/syncthing-wrapper/docs/
