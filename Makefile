@@ -1,6 +1,6 @@
 VERSION_TAG := $(shell git describe --abbrev=0 --tags)
 VERSION := $(VERSION_TAG:v%=%)
-EMVER := $(shell dasel -f manifest.yaml ".version")
+EMVER := $(shell dasel -f manifest.template.yaml ".version")
 
 SYNCTHING_VERSION := "v1.19.1"
 
@@ -25,6 +25,7 @@ make_controller: controller
 
 templates: 
 
-manifest.yaml:
-	dasel put string -f manifest.yaml  ".version" $VERSION
+manifest.yaml: Makefile manifest.template.yaml
+	cp manifest.template.yaml manifest.yaml
+	dasel put string -f manifest.yaml  ".version" $(VERSION) \
 	dasel put string -f manifest.yaml  ".release-notes" "https://github.com/syncthing/syncthing/releases/$(SYNCTHING_VERSION)" 
