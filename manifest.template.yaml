@@ -1,18 +1,3 @@
-actions:
-  permissions:
-    allowed-statuses:
-      - running
-    description: The syncthing uses a smaller set of permission in the file browser
-      for security. Since there are other users that can create permissions that it
-      can't access it is necessary to force ownsership.
-    implementation:
-      args: []
-      entrypoint: force-own.sh
-      image: main
-      inject: true
-      io-format: json
-      type: docker
-    name: Reset File Permissions
 alerts: {}
 assets:
   docker-images: image.tar
@@ -190,3 +175,19 @@ volumes:
   main:
     type: data
 wrapper-repo: https://github.com/Start9Labs/syncthing-wrapper
+actions:
+  permissions:
+    description: Syncthing uses a smaller set of permissions in FileBrowser
+      for security. Since there are other users that can create permissions that it
+      can't access, it is necessary to force ownsership.
+    # Indicates what state the service can be in while executing the action
+    allowed-statuses:
+      - running
+    # Defines how the action is run
+    implementation:
+      type: docker
+      image: main
+      entrypoint: force-own.sh
+      args: []
+      inject: true
+      io-format: json
