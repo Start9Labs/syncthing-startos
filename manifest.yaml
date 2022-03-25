@@ -1,213 +1,192 @@
-id: syncthing
-title: "Syncthing"
-version: 1.19.1
-release-notes: "https://github.com/syncthing/syncthing/releases/tag/v1.19.1"
-license: apache
-wrapper-repo: "https://github.com/Start9Labs/syncthing-wrapper"
-upstream-repo: "https://github.com/syncthing/syncthing"
-support-site: "https://github.com/syncthing/syncthing/issues"
-marketing-site: "https://syncthing.org/"
-build: ["make"]
-min-os-version: "0.3.0"
-description:
-  short: Simple cloud data storage and sharing
-  long: |
-    Syncthing provides a simple file managing and synchronization interface which can be used to upload, download, organize, edit, and share your files across multiple devices.
+actions:
+  permissions:
+    allowed-statuses:
+      - running
+    description: The syncthing uses a smaller set of permission in the file browser
+      for security. Since there are other users that can create permissions that it
+      can't access it is necessary to force ownsership.
+    implementation:
+      args: []
+      entrypoint: force-own.sh
+      image: main
+      inject: true
+      io-format: json
+      type: docker
+    name: Reset File Permissions
+alerts: {}
 assets:
-  license: LICENSE
+  docker-images: image.tar
   icon: icon.png
   instructions: INSTRUCTIONS.md
-  docker-images: image.tar
-main:
-  type: docker
-  image: main
-  entrypoint: tini
-  args: ["entrypoint.sh"]
-  mounts:
-    main: /root
-    filebrowser: /mnt/filebrowser
-  io-format: yaml
-health-checks:
-  version:
-    name: Sync Connection
-    description: Syncthing is running and connected with filebrowser folder
-    type: docker
-    image: main
-    entrypoint: sh
-    args: ["-c", "HOME=/mnt/filebrowser/syncthing syncthing cli config version get || exit 1"]
-    io-format: yaml
-    inject: true
-
-  web-ui:
-    name: Web Interface
-    description: Syncthing has a web ui where all the confirmations, and per folder and device configurations lie.
-    success-message: Syncthing is ready to be visited in your browser.
-    type: docker
-    image: main
-    entrypoint: health-check.sh
-    args: ["web"]
-    io-format: json
-    inject: true
-config:
-  # The config action to run to get the specified config file (default is config.yaml)
-  get:
-    # The type of implementation to run this action (currently, only Docker is available)
-    type: docker
-    # The Docker image to run the action command in. This could be the service's main image, or an image that is preloaded onto the system, like compat (which holds compatible helper functions for default functionality)
-    image: compat
-    # Indicates if an image that is preloaded onto the system will be used
-    system: true
-    # The initial run command to execute the config get action
-    entrypoint: compat
-    # Any arguments that need to be passed into the run command
-    args:
-      - config
-      - get
-      - /root
-      - "/mnt/assets/config_spec.yaml"
-    # The locations at which to mount the specified Docker images
-    mounts:
-      compat: /mnt/assets
-      main: /root
-    # Required - valid values are yaml, toml, json
-    io-format: yaml
-  # The config action to run to set the specified config file (default is config.yaml). Details for the keys below are the same as above.
-  set:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - set
-      - hello-world
-      - /root
-      - "/mnt/assets/config_rules.yaml"
-    mounts:
-      compat: /mnt/assets
-      main: /root
-    io-format: yaml
-properties:
-  type: docker
-  image: compat
-  system: true
-  entrypoint: compat
-  args:
-    - properties
-    - /root
-  mounts:
-    main: /root
-    compat: "/mnt/assets"
-  io-format: yaml
-dependencies:
-  # Key must be the package id of another service that exists in the marketplace
-  filebrowser:
-    # The version range that is acceptable for this dependency
-    version: "^2.14.1.1"
-    # Describes if the dependency is critical to the service functioning. If the dependency is critical, the service will stop if this dependency is stopped.
-    critical: false
-    # Specifies the requirement type of the dependency
-    requirement:
-      # "Opt-out" means the dependency will be required according to the default config. "Opt-in" means the dependency may be required if you change the config. And "required" just means it's always required.
-      type: "opt-out"
-      # An explanation of how to opt-in or opt-out. This value is optional for type=required
-      how: Optionally use Filebrowser as a dependency
-    # Description of the dependency relationship
-    description: Used to store persisted data for Syncthing
-    # This is a list of rules that levies requirements on the configuration of the dependency and suggests ways to remedy any incompatibilities. Documentation of this feature is outside the scope of this example.
-    config: ~
-volumes:
-  filebrowser:
-    package-id: "filebrowser"
-    path: "data"
-    readonly: false
-    type: "pointer"
-    volume-id: "main"
-  compat:
-    type: assets
-  main:
-    type: data
-interfaces:
-  # This key is the internal name that the OS will use to configure the interface
-  main:
-    # A human readable name for display in the UI
-    name: Syncthing UI
-    # A descriptive description of what the interface does
-    description: The user interface to configure, customize, and interact with Syncthing
-    tor-config:
-      # Port mappings are from the external port to the internal container port
-      port-mapping:
-        80: "8384"
-    # Port mappings are from the external port to the internal container port
-    lan-config:
-      443:
-        ssl: true
-        internal: 8384
-    # Denotes if the service has a user interface to display
-    ui: true
-    # Denotes the protocol specifications used by this interface
-    protocols:
-      - tcp
-      - http
-  sync-listening:
-    name: Listening Port
-    description: Listening Port
-    tor-config:
-      # Port mappings are from the external port to the internal container port
-      port-mapping:
-        22000: "22000"
-    # Port mappings are from the external port to the internal container port
-    lan-config:
-      22000:
-        ssl: false
-        internal: 22000
-    ui: false
-    protocols:
-      - tcp
-      - http
-      - udp
-alerts: {}
+  license: LICENSE
 backup:
   create:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
     args:
       - duplicity
       - create
       - /mnt/backup
       - /root/data
+    entrypoint: compat
+    image: compat
+    io-format: yaml
     mounts:
       BACKUP: /mnt/backup
       main: /root/data
-    io-format: yaml
-  restore:
-    type: docker
-    image: compat
     system: true
-    entrypoint: compat
+    type: docker
+  restore:
     args:
       - duplicity
       - restore
       - /mnt/backup
       - /root/data
+    entrypoint: compat
+    image: compat
+    io-format: yaml
     mounts:
       BACKUP: /mnt/backup
       main: /root/data
+    system: true
+    type: docker
+build:
+  - make
+config:
+  get:
+    args:
+      - config
+      - get
+      - /root
+      - /mnt/assets/config_spec.yaml
+    entrypoint: compat
+    image: compat
     io-format: yaml
-actions:
-  permissions:
-    name: Reset File Permissions
-    description: The syncthing uses a smaller set of permission in the file browser for security. Since there are other users that can create permissions that it can't access it is necessary to force ownsership.
-    # Indicates what state the service can be in while executing the action
-    allowed-statuses:
-      - running
-    # Defines how the action is run
-    implementation:
-      type: docker
-      image: main
-      entrypoint: force-own.sh
-      args: []
-      inject: true
-      io-format: json
+    mounts:
+      compat: /mnt/assets
+      main: /root
+    system: true
+    type: docker
+  set:
+    args:
+      - config
+      - set
+      - hello-world
+      - /root
+      - /mnt/assets/config_rules.yaml
+    entrypoint: compat
+    image: compat
+    io-format: yaml
+    mounts:
+      compat: /mnt/assets
+      main: /root
+    system: true
+    type: docker
+dependencies:
+  filebrowser:
+    config: null
+    critical: true
+    description: Used to store persisted data for Syncthing
+    requirement:
+      how: Optionally use Filebrowser as a dependency
+      type: required
+    version: ^2.14.1.1
+description:
+  long: |
+    Syncthing provides a simple file managing and synchronization interface which can be used to upload, download, organize, edit, and share your files across multiple devices.
+  short: Simple cloud data storage and sharing
+health-checks:
+  version:
+    args:
+      - -c
+      - HOME=/mnt/filebrowser/syncthing syncthing cli config version get || exit 1
+    description: Syncthing is running and connected with filebrowser folder
+    entrypoint: sh
+    image: main
+    inject: true
+    io-format: yaml
+    name: Sync Connection
+    type: docker
+  web-ui:
+    args:
+      - web
+    description: Syncthing has a web ui where all the confirmations, and per folder
+      and device configurations lie.
+    entrypoint: health-check.sh
+    image: main
+    inject: true
+    io-format: json
+    name: Web Interface
+    success-message: Syncthing is ready to be visited in your browser.
+    type: docker
+id: syncthing
+interfaces:
+  main:
+    description: The user interface to configure, customize, and interact with Syncthing
+    lan-config:
+      "443":
+        internal: 8384
+        ssl: true
+    name: Syncthing UI
+    protocols:
+      - tcp
+      - http
+    tor-config:
+      port-mapping:
+        "80": "8384"
+    ui: true
+  sync-listening:
+    description: Listening Port
+    lan-config:
+      "22000":
+        internal: 22000
+        ssl: false
+    name: Listening Port
+    protocols:
+      - tcp
+      - http
+      - udp
+    tor-config:
+      port-mapping:
+        "22000": "22000"
+    ui: false
+license: apache
+main:
+  args:
+    - entrypoint.sh
+  entrypoint: tini
+  image: main
+  io-format: yaml
+  mounts:
+    filebrowser: /mnt/filebrowser
+    main: /root
+  type: docker
+marketing-site: https://syncthing.org/
+min-os-version: 0.3.0
+properties:
+  args:
+    - properties
+    - /root
+  entrypoint: compat
+  image: compat
+  io-format: yaml
+  mounts:
+    compat: /mnt/assets
+    main: /root
+  system: true
+  type: docker
+release-notes: https://github.com/syncthing/syncthing/releases/tag/v1.19.1
+support-site: https://github.com/syncthing/syncthing/issues
+title: Syncthing
+upstream-repo: https://github.com/syncthing/syncthing
+version: "1.2"
+volumes:
+  compat:
+    type: assets
+  filebrowser:
+    package-id: filebrowser
+    path: data
+    readonly: false
+    type: pointer
+    volume-id: main
+  main:
+    type: data
+wrapper-repo: https://github.com/Start9Labs/syncthing-wrapper
