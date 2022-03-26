@@ -2,15 +2,15 @@
 
 - Currently there are no officially supported applications for iOS. The only actively maintained project is Möbius Sync - this is *not free* and will require a one-time payment of $4.99 after the first 20 MB.
 
-To use Möbius:
+Start by downloading Möbius Sync - https://www.mobiussync.com/
 
-1. Download - https://www.mobiussync.com/
+# Add a folder
 
-2. Open the app and add any local folder you wish to share (it can be empty)
+1. Open the app and add any local folder you wish to share (it can be empty)
 
-3. You can now add data to this folder and it will be shared by any device you pair with and share the folder with (next step).
+2. You can now add data to this folder and it will be shared by any device you pair with and share the folder with (next step).
 
-# Add your Embassy
+# Add a device
 
 You can add any Syncthing device to any other Syncthing device
 
