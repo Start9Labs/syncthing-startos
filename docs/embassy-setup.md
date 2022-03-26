@@ -22,7 +22,7 @@ Let's set up an example folder to sync photos with
 
 1. Within your Syncthing interface click "Add Folder"
 
-2. In "Folder ID" enter the name of the folder you'd like to create - the will automatically be within the directory FileBrowser already created for Syncthing.
+2. In "Folder ID" enter the name of the folder you'd like to create - this will automatically be within the directory FileBrowser already created for Syncthing.
 
 3. Next - click "Save"
 
