@@ -32,12 +32,12 @@ That's it, you have a folder ready to sync to other devices!
 
 See the following guides for each device you would like to setup:
 
-[Linux](./linux.md)
+[Linux](./platforms/linux.md)
 
-[MacOS](./macos.md)
+[MacOS](./platforms/macos.md)
 
-[Windows](./windows.md)
+[Windows](./platforms/windows.md)
 
-[Android](./android.md)
+[Android](./platforms/android.md)
 
-[iOS](./ios.md)
+[iOS](./platforms/ios.md)
