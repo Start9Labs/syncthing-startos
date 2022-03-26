@@ -20,15 +20,13 @@ The panel on the left side are the folders for syncing, and the right side are t
 
 Let's set up an example folder to sync photos with
 
-1. Open your File Browser UI from your Embassy
+1. Within your Syncthing interface click "Add Folder"
 
-2. You will see that a new directory has been created for you called "syncthing" - go ahead and enter this directory
+2. In "Folder ID" enter the name of the folder you'd like to create - the will automatically be within the directory FileBrowser already created for Syncthing.
 
-3. You will see a folder called Sync.  This is the default folder and it will automatically sync across all devices.  We recommend making your own folders so that you may fine tune for different use cases.  For this example, we create a directory and call it "Photos."  Then we'll drag in a couple pictures to test with.
+3. Next - click "Save"
 
-4. Next, back in your Admin Interface, Click "Add Folder."
-
-5. Fill in the Folder Label with the name of the directory ("Photos"), this will edit the folder path below.  Ensure it is correct.  Then click Save.
+4. In the future, once you have added other devices, you can return to this folder, click "Edit", go to "Sharing" and add any device you wish to share this folder with.
 
 That's it, you have a folder with pictures, ready to sync to other devices!
 
