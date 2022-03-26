@@ -3,3 +3,4 @@ syncthing.s9pk
 **/node_modules/
 makeStats
 controller/target
+manifest.yaml
