@@ -28,7 +28,7 @@ Let's set up an example folder to sync photos with
 
 4. In the future, once you have added other devices, you can return to this folder, click "Edit", go to "Sharing" and add any device you wish to share this folder with.
 
-That's it, you have a folder with pictures, ready to sync to other devices!
+That's it, you have a folder ready to sync to other devices!
 
 See the following guides for each device you would like to setup:
 
