@@ -2,9 +2,9 @@ actions:
   permissions:
     allowed-statuses:
       - running
-    description: The syncthing uses a smaller set of permission in the file browser
-      for security. Since there are other users that can create permissions that it
-      can't access it is necessary to force ownsership.
+    description: Syncthing uses a smaller set of permissions in FileBrowser for security.
+      Since there are other users that can create permissions that it can't access,
+      it is necessary to force ownsership.
     implementation:
       args: []
       entrypoint: force-own.sh
