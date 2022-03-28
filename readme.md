@@ -4,7 +4,7 @@
 
 - [docker](https://docs.docker.com/get-docker)
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
-- [yq](https://mikefarah.gitbook.io/yq)
+- [dasel](https://github.com/TomWright/dasel)
 - [tiny-tmpl](https://github.com/Start9Labs/templating-engine-rs.git)
 - [backend](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 
