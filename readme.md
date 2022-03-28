@@ -1,5 +1,7 @@
 # Wrapper for Syncthing
 
+This is a EmbassyOS wrapper for [Syncthing](https://github.com/syncthing/syncthing).
+
 ## Dependencies
 
 - [docker](https://docs.docker.com/get-docker)
