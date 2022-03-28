@@ -1,18 +1,4 @@
-actions:
-  permissions:
-    allowed-statuses:
-      - running
-    description: Syncthing uses a smaller set of permissions in FileBrowser for security.
-      Since there are other users that can create permissions that it can't access,
-      it is necessary to force ownsership.
-    implementation:
-      args: []
-      entrypoint: force-own.sh
-      image: main
-      inject: true
-      io-format: json
-      type: docker
-    name: Reset File Permissions
+actions: {}
 alerts: {}
 assets:
   docker-images: image.tar
