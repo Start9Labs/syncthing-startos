@@ -5,8 +5,7 @@
 - [docker](https://docs.docker.com/get-docker)
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
 - [dasel](https://github.com/TomWright/dasel)
-- [tiny-tmpl](https://github.com/Start9Labs/templating-engine-rs.git)
-- [backend](https://github.com/Start9Labs/embassy-os/tree/master/backend)
+- [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 
 ## Cloning
 
@@ -21,14 +20,12 @@ cd syncthing-wrapper
 make
 ```
 
-## Installing (on Embassy)
+## Side Loading on Embassy
 
-After one has built the s9pk, copy this c9pk into the embassy for side loading, which we shall call Embassy.Could be Created in ~/.ssh/config.
-Then on the device, we probably need to login, then followed by installing it.
 
 ```sh
-scp syncthing.s9pk Embassy:/tmp # Copying our file across
-ssh Embassy # Going into embassy
-embassy-cli auth login # Login to the system
+scp syncthing.s9pk root@embassy-<id>.local:/tmp # Copying our file across
+ssh root@embassy-<id>.local
+embassy-cli auth login
 embassy-cli package install syncthing.s9pk # Install the sideloaded package
 ```
