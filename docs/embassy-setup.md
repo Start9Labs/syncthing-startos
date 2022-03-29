@@ -1,34 +1,26 @@
-# Embassy Setup
+# Initial Setup
 
-**Note:** File Browser is a prerequisite for Syncthing, so make sure you have that installed first.
+**Note:** On Embassy, Syncthing depends on File Browser as its underlying file system.
 
-1. Head over to the Marketplace and install Syncthing.
+1. Install Syncthing from the Start9 Service Marketplace.
+1. Configure Synthing. A default username and random password are created for you, but feel free to change either.
+1. Click "Start".
+1. Go into "Properties" and copy your password.
+1. When Syncthing health checks show "Success," go ahead and launch the UI. You can use Syncthing on either LAN or Tor.
+1. Enter your username and paste in your password from Properties (above). We recommend saving these credentials into your Embassy Bitwarden for secure, easy access later on.
+1. Notice in File Browser, there is now a folder called "syncthing". **DO NOT** delete or rename this folder. It is where all your future shared folders will live.
 
-2. Once it is installed, hit Config.  A random, strong password has been generated for your admin account, but you may change it if you wish.  Then click Save.
+## Basic Usage Instructions
 
-3. Click Start to run the Service.  While it is starting, click Properties and copy your password.  We will need this shortly.
+Syncthing is very powerful, and also very complex. If you use it recklessly, you may experience buggy behavior or loss of data, _so be careful_.
 
-4. Once you see the Health Checks showing "Success," go ahead and launch the UI.  This will work on both LAN and Tor.  Obviously LAN is a bit faster if it is available to you.  You may like to [Setup LAN Access](https://start9.com/latest/user-manual/connecting/connecting-lan), if you have not already.
+How you use Syncthing will depend on your needs and how comfortable you become with the software. _Practice makes perfect_.
 
-5. Enter your username and paste in your password from earlier.  Save these into your Bitwarden for easy access.
+### ** Our Recommendation **
 
-## Setup Folders
+We recommend that you begin using Syncthing as an automated cloud backup solution for your various client devices: phones, laptops, tablets, etc. This is a straightforward and easy-to-understand use case.
 
-Welcome to your Syncthing Admin Interface.  This is the control panel for adding devices and folders that you would like to keep in sync.
-
-The panel on the left side are the folders for syncing, and the right side are the devices, with your Embassy as "This Device," with additional metrics.
-
-Let's set up an example folder to sync photos with
-
-1. Within your Syncthing interface click "Add Folder"
-
-2. In "Folder ID" enter the name of the folder you'd like to create - this will automatically be placed within the directory FileBrowser already has for Syncthing.
-
-3. Next - click "Save"
-
-4. In the future, once you have added other devices, you can return to this folder, click "Edit", go to "Sharing" and add any device you wish to share this folder with.
-
-That's it, you have a folder ready to sync to other devices!
+To accomplish this, you will install Syncthing on your client device, then add your Embassy as a remote device. Then, you can select which folders to share with your Embassy. From then on, those folders on your client device will be automatically backed up to your Embassy File Browser. It's magic :)
 
 See the following guides for each device you would like to setup:
 
