@@ -24,4 +24,4 @@
 1. Under "Folder Type", we recommend setting it to "Send Only". This means that your Embassy is truly just a backup. If you edit, add, or delete files inside this shared folder in your Embassy, those changes will not be honored. You Android device is the source of truth. By using "Send and Receive" or "Receive Only" you are granting your Embassy the power to edit, add, or delete files from your phone. While this is very powerful, it can also be dangerous, so be careful
 1. Optionally set "Watch for Changes" and "File Pull Order"
 1. Tap the checkmark to save
-1. This folder should immediately begin syncing to File Browser on your Embassy inside the "syncthing folder".
+1. This folder should immediately begin syncing to File Browser on your Embassy inside the "syncthing folder"
