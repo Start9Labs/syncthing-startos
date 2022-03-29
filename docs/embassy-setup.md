@@ -2,13 +2,15 @@
 
 **Note:** On Embassy, Syncthing depends on File Browser as its underlying file system.
 
-1. Install Syncthing from the Start9 Service Marketplace.
-1. Configure Synthing. A default username and random password are created for you, but feel free to change either.
-1. Click "Start".
-1. Go into "Properties" and copy your password.
-1. When Syncthing health checks show "Success," go ahead and launch the UI. You can use Syncthing on either LAN or Tor.
-1. Enter your username and paste in your password from Properties (above). We recommend saving these credentials into your Embassy Bitwarden for secure, easy access later on.
-1. Notice in File Browser, there is now a folder called "syncthing". **DO NOT** delete or rename this folder. It is where all your future shared folders will live.
+1. Install Syncthing from the Start9 Service Marketplace
+1. Configure Synthing. A default username and random password are created for you, but feel free to change either
+1. Click "Start"
+1. Go into "Properties" and copy your password
+1. When Syncthing health checks show "Success," go ahead and launch the UI. You can use Syncthing on either LAN or Tor
+1. Enter your username and paste in your password from Properties (above). We recommend saving these credentials into your Embassy Bitwarden for secure, easy access later on
+1. Inside Actions -> Settings give your device a name. Something like "Bob Embassy"
+1. It is recommended to familiarize yourself with the various other settings available to you
+1. Notice in File Browser, there is now a folder called "syncthing". **DO NOT** delete or rename this folder. It is where all your future shared folders will live
 
 ## Basic Usage Instructions
 
