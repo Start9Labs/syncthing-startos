@@ -1,9 +1,10 @@
 #!/bin/sh
 
 check_web(){
-    curl --silent --fail localhost:8384/ &>/dev/null
+    curl -u $(jq -r '.username' /root/config.json):$(jq -r '.password' /root/config.json) --silent --fail localhost:8384/ &>/dev/null
     RES=$?
-    if test "$RES" != 0 && test "$RES" != 22; then
+    echo RES
+    if test "$RES" != 0; then
         echo "Web interface is unreachable" >&2
         exit 1
     fi

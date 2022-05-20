@@ -38,34 +38,9 @@ build:
   - make
 config:
   get:
-    args:
-      - config
-      - get
-      - /root
-      - /mnt/assets/config_spec.yaml
-    entrypoint: compat
-    image: compat
-    io-format: yaml
-    mounts:
-      compat: /mnt/assets
-      main: /root
-    system: true
-    type: docker
+    type: script
   set:
-    args:
-      - config
-      - set
-      - hello-world
-      - /root
-      - /mnt/assets/config_rules.yaml
-    entrypoint: compat
-    image: compat
-    io-format: yaml
-    mounts:
-      compat: /mnt/assets
-      main: /root
-    system: true
-    type: docker
+    type: script
 dependencies:
   filebrowser:
     config: null
@@ -146,17 +121,7 @@ main:
   type: docker
 marketing-site: https://syncthing.org/
 properties:
-  args:
-    - properties
-    - /root
-  entrypoint: compat
-  image: compat
-  io-format: yaml
-  mounts:
-    compat: /mnt/assets
-    main: /root
-  system: true
-  type: docker
+  type: script
 release-notes: https://github.com/syncthing/syncthing/releases/v1.19.1
 support-site: https://github.com/syncthing/syncthing/issues
 title: Syncthing

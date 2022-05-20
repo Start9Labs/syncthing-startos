@@ -1,9 +1,10 @@
-FROM syncthing/syncthing:1.19.1
+FROM syncthing/syncthing:1.20.1
 
 FROM alpine:3.15
 
 RUN apk add --no-cache tini
 RUN apk add --no-cache yq
+RUN apk add --no-cache jq
 RUN apk add --no-cache curl
 RUN apk add --no-cache inotify-tools
 
@@ -13,7 +14,6 @@ RUN adduser --disabled-password syncthing_user
 
 COPY docker_files/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-COPY controller/target/aarch64-unknown-linux-musl/release/controller /usr/bin
 COPY docker_files/health-check.sh /usr/bin
 COPY docker_files/watch-and-own.sh /usr/bin
 COPY docker_files/force-own.sh /usr/bin
