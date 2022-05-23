@@ -11,7 +11,7 @@ all: verify
 install: syncthing.s9pk
 	embassy-cli package install syncthing.s9pk
 
-syncthing.s9pk: manifest.yaml image.tar INSTRUCTIONS.md LICENSE $(ASSET_PATHS)
+syncthing.s9pk: manifest.yaml image.tar INSTRUCTIONS.md LICENSE $(ASSET_PATHS) scripts/embassy.js
 	embassy-sdk pack
 	
 verify: syncthing.s9pk
@@ -19,6 +19,11 @@ verify: syncthing.s9pk
 
 image.tar: Dockerfile templates
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/syncthing/main:${EMVER} --platform=linux/arm64/v8 -o type=docker,dest=image.tar .
+
+scripts/embassy.js: scripts/embassy-pre.js
+	deno bundle scripts/embassy-pre.js scripts/embassy.js
+
+scripts/embassy-pre.js: .
 
 templates: 
 
