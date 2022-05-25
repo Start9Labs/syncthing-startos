@@ -1,6 +1,6 @@
 // @ts-check
 
-import matches from "https://deno.land/x/ts_matches/mod.ts";
+import matches from "https://deno.land/x/ts_matches@5.1.5/mod.ts";
 const { shape, number, string, some } = matches;
 
 /**
@@ -11,9 +11,6 @@ const { shape, number, string, some } = matches;
  * @typedef {import('https://raw.githubusercontent.com/Start9Labs/embassy-os/fix/making-js-work/backend/test/js_action_execute/package-data/scripts/test-package/0.3.0.3/types.d.ts').Properties} Properties
  */
 
-/**
- 
- */
 const matchesStringRec = some(
   string,
   shape(
@@ -24,7 +21,7 @@ const matchesStringRec = some(
     ["charset"]
   )
 );
-const matchesConfigRec = shape({
+const matchesConfig = shape({
   username: matchesStringRec,
   password: matchesStringRec,
 });
@@ -40,21 +37,16 @@ const matchesConfigFile = shape({
  * @returns {Promise<ConfigRes>}
  */
 export async function getConfig(effects) {
-  const defaults = matchesConfigRec.unsafeCast(
-    await effects
-      .readJsonFile({
-        volumeId: "main",
-        path: "config.json",
-      })
-      .catch(() => ({
-        username: "admin",
-        password: {
-          charset: "a-z,A-Z,0-9",
-          len: 22,
-        },
-      }))
-  );
+  const config = await effects
+    .readJsonFile({
+      volumeId: "main",
+      path: "config.json",
+    })
+    .then((x) => matchesConfig.unsafeCast(x))
+    .catch(() => undefined);
+
   return {
+    config,
     spec: {
       "tor-address": {
         name: "Tor Address",
@@ -68,22 +60,23 @@ export async function getConfig(effects) {
       username: {
         type: "string",
         name: "Username",
-        description:
-          "The user for loging into the administration page of syncthing",
+        description: "The user for loging into the administration page of syncthing",
         nullable: false,
         copyable: true,
         masked: false,
-        default: /** @type {any} */ defaults.username,
+        default: "admin",
       },
       password: {
         type: "string",
         name: "Password",
-        description:
-          "The password for loging into the administration page of syncthing",
+        description: "The password for loging into the administration page of syncthing",
         nullable: false,
         copyable: true,
         masked: true,
-        default: defaults.password,
+        default: {
+          charset: "a-z,A-Z,0-9",
+          len: 22,
+        },
       },
     },
   };
@@ -129,9 +122,7 @@ export async function properties(effects) {
     path: "config.json",
   });
 
-  const syncthing_system = matchesSyncthingSystem.unsafeCast(
-    await syncthing_system_promise
-  );
+  const syncthing_system = matchesSyncthingSystem.unsafeCast(await syncthing_system_promise);
   const config = matchesConfigFile.unsafeCast(await config_promise);
 
   return {

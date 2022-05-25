@@ -975,7 +975,7 @@ const matchesStringRec = some1(string1, shape1({
 }, [
     "charset"
 ]));
-const matchesConfigRec = shape1({
+const matchesConfig = shape1({
     username: matchesStringRec,
     password: matchesStringRec
 });
@@ -984,18 +984,14 @@ const matchesConfigFile = shape1({
     password: string1
 });
 async function getConfig(effects) {
-    const defaults = matchesConfigRec.unsafeCast(await effects.readJsonFile({
+    const config = await effects.readJsonFile({
         volumeId: "main",
         path: "config.json"
-    }).catch(()=>({
-            username: "admin",
-            password: {
-                charset: "a-z,A-Z,0-9",
-                len: 22
-            }
-        })
-    ));
+    }).then((x)=>matchesConfig.unsafeCast(x)
+    ).catch(()=>undefined
+    );
     return {
+        config,
         spec: {
             "tor-address": {
                 name: "Tor Address",
@@ -1013,7 +1009,7 @@ async function getConfig(effects) {
                 nullable: false,
                 copyable: true,
                 masked: false,
-                default: defaults.username
+                default: "admin"
             },
             password: {
                 type: "string",
@@ -1022,7 +1018,10 @@ async function getConfig(effects) {
                 nullable: false,
                 copyable: true,
                 masked: true,
-                default: defaults.password
+                default: {
+                    charset: "a-z,A-Z,0-9",
+                    len: 22
+                }
             }
         }
     };
