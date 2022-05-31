@@ -20,10 +20,10 @@ verify: syncthing.s9pk
 image.tar: Dockerfile templates
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/syncthing/main:${EMVER} --platform=linux/arm64/v8 -o type=docker,dest=image.tar .
 
-scripts/embassy.js: scripts/embassy-pre.js
-	deno bundle scripts/embassy-pre.js scripts/embassy.js
+scripts/embassy.js: scripts/embassy.ts
+	deno bundle scripts/embassy.ts scripts/embassy.js
 
-scripts/embassy-pre.js: .
+scripts/embassy.ts: .
 
 templates: 
 

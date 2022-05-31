@@ -3,13 +3,14 @@
 import matches from "https://deno.land/x/ts_matches@5.1.5/mod.ts";
 const { shape, number, string, some } = matches;
 
-/**
- * @typedef {import('https://raw.githubusercontent.com/Start9Labs/embassy-os/fix/making-js-work/backend/test/js_action_execute/package-data/scripts/test-package/0.3.0.3/types.d.ts').Effects} Effects
- * @typedef {import('https://raw.githubusercontent.com/Start9Labs/embassy-os/fix/making-js-work/backend/test/js_action_execute/package-data/scripts/test-package/0.3.0.3/types.d.ts').ConfigRes} ConfigRes
- * @typedef {import('https://raw.githubusercontent.com/Start9Labs/embassy-os/fix/making-js-work/backend/test/js_action_execute/package-data/scripts/test-package/0.3.0.3/types.d.ts').Config} Config
- * @typedef {import('https://raw.githubusercontent.com/Start9Labs/embassy-os/fix/making-js-work/backend/test/js_action_execute/package-data/scripts/test-package/0.3.0.3/types.d.ts').SetResult} SetResult
- * @typedef {import('https://raw.githubusercontent.com/Start9Labs/embassy-os/fix/making-js-work/backend/test/js_action_execute/package-data/scripts/test-package/0.3.0.3/types.d.ts').Properties} Properties
- */
+import {
+  Effects,
+  ConfigRes,
+  Config,
+  SetResult,
+  Properties,
+  Dependencies,
+} from "https://raw.githubusercontent.com/Start9Labs/embassy-os/master/backend/test/js_action_execute/package-data/scripts/test-package/0.3.0.3/types.d.ts";
 
 const matchesStringRec = some(
   string,
@@ -31,12 +32,7 @@ const matchesConfigFile = shape({
   password: string,
 });
 
-/**
- *
- * @param {Effects} effects
- * @returns {Promise<ConfigRes>}
- */
-export async function getConfig(effects) {
+export async function getConfig(effects: Effects): Promise<ConfigRes> {
   const config = await effects
     .readJsonFile({
       volumeId: "main",
@@ -82,14 +78,8 @@ export async function getConfig(effects) {
   };
 }
 
-/**
- *
- * @param {Effects} effects
- * @param {Config} input
- * @returns {Promise<SetResult>}
- */
-export async function setConfig(effects, input) {
-  effects.writeJsonFile({
+export async function setConfig(effects: Effects, input: Config): Promise<SetResult> {
+  await effects.writeJsonFile({
     path: "./config.json",
     toWrite: {
       username: input?.username,
@@ -107,12 +97,7 @@ const matchesSyncthingSystem = shape({
   myID: string,
 });
 
-/**
- *
- * @param {Effects} effects
- * @returns {Promise<Properties>}
- */
-export async function properties(effects) {
+export async function properties(effects: Effects): Promise<Properties> {
   const syncthing_system_promise = effects.readJsonFile({
     volumeId: "main",
     path: "syncthing_stats.json",
