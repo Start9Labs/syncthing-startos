@@ -1,17 +1,12 @@
-// @ts-check
-
 import matches from "https://deno.land/x/ts_matches@5.1.5/mod.ts";
 const { shape, number, string, some } = matches;
 
 import {
-  Effects,
-  ConfigRes,
   Config,
-  SetResult,
+  Effects,
+  ExpectedExports,
   Properties,
-  Dependencies,
-  ExpectedExports
-} from "https://raw.githubusercontent.com/Start9Labs/embassy-os/5a88f41718836e2b05a0b67c096193e0070fb4ec/libs/artifacts/types.d.ts";
+} from "https://start9.com/procedure/types.0.3.1.d.ts ";
 
 const matchesStringRec = some(
   string,
@@ -20,8 +15,8 @@ const matchesStringRec = some(
       charset: string,
       len: number,
     },
-    ["charset"]
-  )
+    ["charset"],
+  ),
 );
 const matchesConfig = shape({
   username: matchesStringRec,
@@ -33,7 +28,9 @@ const matchesConfigFile = shape({
   password: string,
 });
 
-export const getConfig: ExpectedExports.getConfig = async (effects: Effects) => {
+export const getConfig: ExpectedExports.getConfig = async (
+  effects: Effects,
+) => {
   const config = await effects
     .readJsonFile({
       volumeId: "main",
@@ -58,7 +55,8 @@ export const getConfig: ExpectedExports.getConfig = async (effects: Effects) => 
         username: {
           type: "string",
           name: "Username",
-          description: "The user for loging into the administration page of syncthing",
+          description:
+            "The user for loging into the administration page of syncthing",
           nullable: false,
           copyable: true,
           masked: false,
@@ -67,7 +65,8 @@ export const getConfig: ExpectedExports.getConfig = async (effects: Effects) => 
         password: {
           type: "string",
           name: "Password",
-          description: "The password for loging into the administration page of syncthing",
+          description:
+            "The password for loging into the administration page of syncthing",
           nullable: false,
           copyable: true,
           masked: true,
@@ -77,11 +76,14 @@ export const getConfig: ExpectedExports.getConfig = async (effects: Effects) => 
           },
         },
       },
-    }
+    },
   };
-}
+};
 
-export const setConfig: ExpectedExports.setConfig = async (effects: Effects, input: Config) => {
+export const setConfig: ExpectedExports.setConfig = async (
+  effects: Effects,
+  input: Config,
+) => {
   await effects.writeJsonFile({
     path: "./config.json",
     toWrite: {
@@ -94,9 +96,9 @@ export const setConfig: ExpectedExports.setConfig = async (effects: Effects, inp
     result: {
       signal: "SIGTERM",
       "depends-on": {},
-    }
-  }
-}
+    },
+  };
+};
 
 const matchesSyncthingSystem = shape({
   myID: string,
@@ -112,7 +114,9 @@ export const properties: ExpectedExports.properties = async (effects) => {
     path: "config.json",
   });
 
-  const syncthing_system = matchesSyncthingSystem.unsafeCast(await syncthing_system_promise);
+  const syncthing_system = matchesSyncthingSystem.unsafeCast(
+    await syncthing_system_promise,
+  );
   const config = matchesConfigFile.unsafeCast(await config_promise);
 
   const result: Properties = {
@@ -145,4 +149,4 @@ export const properties: ExpectedExports.properties = async (effects) => {
     },
   };
   return { result };
-}
+};
