@@ -1,4 +1,4 @@
-FROM syncthing/syncthing:1.20.1
+FROM syncthing/syncthing:1.20.2
 
 FROM alpine:3.15
 
