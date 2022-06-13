@@ -11,17 +11,19 @@ all: verify
 install: syncthing.s9pk
 	embassy-cli package install syncthing.s9pk
 
-syncthing.s9pk: manifest.yaml image.tar INSTRUCTIONS.md LICENSE $(ASSET_PATHS)
+syncthing.s9pk: manifest.yaml image.tar INSTRUCTIONS.md LICENSE $(ASSET_PATHS) scripts/embassy.js
 	embassy-sdk pack
 	
 verify: syncthing.s9pk
 	embassy-sdk verify s9pk syncthing.s9pk
 
-image.tar: Dockerfile templates make_controller
+image.tar: Dockerfile templates
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/syncthing/main:${EMVER} --platform=linux/arm64/v8 -o type=docker,dest=image.tar .
 
-make_controller: controller
-	docker run --rm -it -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/controller:/home/rust/src start9/rust-musl-cross:aarch64-musl cargo build --release
+scripts/embassy.js: scripts/embassy.ts
+	deno bundle scripts/embassy.ts scripts/embassy.js
+
+scripts/embassy.ts: .
 
 templates: 
 

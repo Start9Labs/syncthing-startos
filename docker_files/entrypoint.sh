@@ -17,8 +17,8 @@ done
 echo "Syncthing Settings"
 sleep .1
 syncthing cli config gui raw-address set -- 0.0.0.0:8384
-syncthing cli config gui user set -- $(yq eval '.username' /root/start9/config.yaml)
-syncthing cli config gui password set -- $(yq eval '.password' /root/start9/config.yaml)
+syncthing cli config gui user set -- $(jq -r '.username' /root/config.json)
+syncthing cli config gui password set -- $(jq -r '.password' /root/config.json)
 syncthing cli config options uraccepted set -- -1
 syncthing cli config defaults device auto-accept-folders set true
 syncthing cli config defaults device introducer set true
@@ -28,7 +28,7 @@ while [[ "$(syncthing cli show system)" =~ 'no such file or directory' ]] || [[ 
   echo "I'm sleeping"
 done
 
-controller create-stats
+syncthing cli show system > /root/syncthing_stats.json
 
 watch-and-own.sh &
 
