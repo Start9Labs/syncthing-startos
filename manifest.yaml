@@ -126,7 +126,7 @@ release-notes: https://github.com/syncthing/syncthing/releases/v1.19.1
 support-site: https://github.com/syncthing/syncthing/issues
 title: Syncthing
 upstream-repo: https://github.com/syncthing/syncthing
-version: 1.19.1
+version: 1.20.1
 volumes:
   compat:
     type: assets
