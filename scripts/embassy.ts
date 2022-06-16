@@ -1,12 +1,12 @@
 import matches from "https://deno.land/x/ts_matches@5.1.5/mod.ts";
-const { shape, number, string, some } = matches;
+const { shape, number, string, some, literal } = matches;
 
 import {
   Config,
   Effects,
   ExpectedExports,
   Properties,
-} from "https://start9.com/procedure/types.0.3.1.d.ts ";
+} from "./types.d.ts";
 
 const matchesStringRec = some(
   string,
@@ -150,3 +150,83 @@ export const properties: ExpectedExports.properties = async (effects) => {
   };
   return { result };
 };
+const parsableInt = string.map(Number).refine(function isInt(x): x is number { return Number.isInteger(x) })
+const okRegex = /Ok:.+/
+const errorRegex = /Error:\s?(.+)/
+export const health: ExpectedExports.health = {
+  async version(effects) {
+    try {
+      const version = await effects.readFile({
+        volumeId: "main",
+        path: "./health-version",
+      }).then(x => x.trim());
+      const result = matches(version)
+        .when(parsableInt, () => ({
+          result: null,
+        }))
+        .when(literal('read'), () => ({
+          'error': "Health has not ran recent enough",
+        }))
+        .defaultTo({
+          'error-code': [61, `No catching: ${JSON.stringify(version)}`] as const,
+        });
+      await effects.writeFile({
+        volumeId: "main",
+        toWrite: "read",
+        path: "health-version",
+      })
+      return result;
+    }
+    catch (e) {
+      effects.error(`Health check failed: ${e}`);
+      return {
+        'error-code': [61, "No file indicating health has ran"] as const,
+      }
+
+    }
+  },
+  async "web-ui"(effects) {
+    try {
+      const fileContents = await effects.readFile({
+        volumeId: "main",
+        path: "./health-web",
+      }).then(x => x.trim());
+      const result = matches(fileContents)
+        .when(literal('read'), () => ({
+          'error': "Health has not ran recent enough",
+        }))
+        .when(string, (x) => {
+          if (okRegex.test(x)) {
+            return {
+              result: null,
+            };
+          }
+          const errorExec = errorRegex.exec(x);
+          if (errorExec) {
+            return {
+              error: errorExec[1],
+            }
+          }
+          return {
+            error: `Unknown file contents: ${x}`
+          }
+        })
+        .defaultTo({
+          'error-code': [61, `No catching: ${JSON.stringify(fileContents)}`] as const,
+        });
+      await effects.writeFile({
+        volumeId: "main",
+        toWrite: "read",
+        path: "health-web",
+      })
+      return result;
+    }
+    catch (e) {
+      effects.error(`Health check failed: ${e}`);
+      return {
+        'error-code': [61, "No file indicating health web has ran"] as const,
+      }
+
+    }
+  }
+}

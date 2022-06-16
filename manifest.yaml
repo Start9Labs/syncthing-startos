@@ -55,28 +55,13 @@ description:
 donation-url: https://syncthing.net/donations/
 health-checks:
   version:
-    args:
-      - -c
-      - HOME=/mnt/filebrowser/syncthing syncthing cli config version get || exit 1
-    success-message: Syncthing is running and connected with filebrowser folder
-    entrypoint: sh
-    image: main
-    inject: true
-    io-format: yaml
     name: Sync Connection
-    type: docker
+    success-message: Syncthing is running and connected with filebrowser folder
+    type: script
   web-ui:
-    args:
-      - web
-    success-message: Syncthing has a web ui where all the confirmations, and per folder
-      and device configurations lie.
-    entrypoint: health-check.sh
-    image: main
-    inject: true
-    io-format: json
     name: Web Interface
     success-message: Syncthing is ready to be visited in your browser.
-    type: docker
+    type: script
 id: syncthing
 interfaces:
   main:
