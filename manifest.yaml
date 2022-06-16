@@ -124,3 +124,10 @@ volumes:
   main:
     type: data
 wrapper-repo: https://github.com/Start9Labs/syncthing-wrapper
+migrations:
+  from:
+    "*":
+      type: script
+  to:
+    "*":
+      type: script

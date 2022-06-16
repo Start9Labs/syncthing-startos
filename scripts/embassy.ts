@@ -1,12 +1,7 @@
 import matches from "https://deno.land/x/ts_matches@5.1.5/mod.ts";
 const { shape, number, string, some, literal } = matches;
 
-import {
-  Config,
-  Effects,
-  ExpectedExports,
-  Properties,
-} from "./types.d.ts";
+import { Config, Effects, ExpectedExports, Properties } from "./types.d.ts";
 
 const matchesStringRec = some(
   string,
@@ -150,39 +145,42 @@ export const properties: ExpectedExports.properties = async (effects) => {
   };
   return { result };
 };
-const parsableInt = string.map(Number).refine(function isInt(x): x is number { return Number.isInteger(x) })
-const okRegex = /Ok:.+/
-const errorRegex = /Error:\s?(.+)/
+const parsableInt = string.map(Number).refine(function isInt(x): x is number {
+  return Number.isInteger(x);
+});
+const okRegex = /Ok:.+/;
+const errorRegex = /Error:\s?(.+)/;
 export const health: ExpectedExports.health = {
   async version(effects) {
     try {
       const version = await effects.readFile({
         volumeId: "main",
         path: "./health-version",
-      }).then(x => x.trim());
+      }).then((x) => x.trim());
       const result = matches(version)
         .when(parsableInt, () => ({
           result: null,
         }))
-        .when(literal('read'), () => ({
-          'error': "Health has not ran recent enough",
+        .when(literal("read"), () => ({
+          "error": "Health has not ran recent enough",
         }))
         .defaultTo({
-          'error-code': [61, `No catching: ${JSON.stringify(version)}`] as const,
+          "error-code": [
+            61,
+            `No catching: ${JSON.stringify(version)}`,
+          ] as const,
         });
       await effects.writeFile({
         volumeId: "main",
         toWrite: "read",
         path: "health-version",
-      })
+      });
       return result;
-    }
-    catch (e) {
+    } catch (e) {
       effects.error(`Health check failed: ${e}`);
       return {
-        'error-code': [61, "No file indicating health has ran"] as const,
-      }
-
+        "error-code": [61, "No file indicating health has ran"] as const,
+      };
     }
   },
   async "web-ui"(effects) {
@@ -190,10 +188,10 @@ export const health: ExpectedExports.health = {
       const fileContents = await effects.readFile({
         volumeId: "main",
         path: "./health-web",
-      }).then(x => x.trim());
+      }).then((x) => x.trim());
       const result = matches(fileContents)
-        .when(literal('read'), () => ({
-          'error': "Health has not ran recent enough",
+        .when(literal("read"), () => ({
+          "error": "Health has not ran recent enough",
         }))
         .when(string, (x) => {
           if (okRegex.test(x)) {
@@ -205,28 +203,33 @@ export const health: ExpectedExports.health = {
           if (errorExec) {
             return {
               error: errorExec[1],
-            }
+            };
           }
           return {
-            error: `Unknown file contents: ${x}`
-          }
+            error: `Unknown file contents: ${x}`,
+          };
         })
         .defaultTo({
-          'error-code': [61, `No catching: ${JSON.stringify(fileContents)}`] as const,
+          "error-code": [
+            61,
+            `No catching: ${JSON.stringify(fileContents)}`,
+          ] as const,
         });
       await effects.writeFile({
         volumeId: "main",
         toWrite: "read",
         path: "health-web",
-      })
+      });
       return result;
-    }
-    catch (e) {
+    } catch (e) {
       effects.error(`Health check failed: ${e}`);
       return {
-        'error-code': [61, "No file indicating health web has ran"] as const,
-      }
-
+        "error-code": [61, "No file indicating health web has ran"] as const,
+      };
     }
-  }
-}
+  },
+};
+
+export const migration: ExpectedExports.migration = async () => ({
+  result: { configured: true },
+});
