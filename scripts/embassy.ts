@@ -1,7 +1,12 @@
 import matches from "https://deno.land/x/ts_matches@5.1.5/mod.ts";
 const { shape, number, string, some, literal } = matches;
 
-import { Config, Effects, ExpectedExports, Properties } from "./types.d.ts";
+import {
+  Config,
+  Effects,
+  ExpectedExports,
+  Properties,
+} from "https://start9.com/procedure/types.0.3.1.d.ts";
 
 const matchesStringRec = some(
   string,
