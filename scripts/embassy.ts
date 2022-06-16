@@ -156,31 +156,34 @@ const parsableInt = string.map(Number).refine(function isInt(x): x is number {
 const okRegex = /Ok:.+/;
 const errorRegex = /Error:\s?(.+)/;
 export const health: ExpectedExports.health = {
-  async version(effects) {
+  async version(effects, lastCall) {
     try {
       const version = await effects.readFile({
         volumeId: "main",
         path: "./health-version",
       }).then((x) => x.trim());
-      const result = matches(version)
-        .when(parsableInt, () => ({
-          result: null,
-        }))
-        .when(literal("read"), () => ({
-          "error": "Health has not ran recent enough",
-        }))
-        .defaultTo({
-          "error-code": [
-            61,
-            `No catching: ${JSON.stringify(version)}`,
-          ] as const,
-        });
-      await effects.writeFile({
+      const metaInformation = await effects.metadata({
         volumeId: "main",
-        toWrite: "read",
-        path: "health-version",
+        path: "./health-version",
       });
-      return result;
+      const timeSinceLast = Date.now() -
+        (metaInformation.modified?.valueOf() ?? Date.now());
+      if (
+        (timeSinceLast >
+          lastCall)
+      ) {
+        return {
+          "error": `Health has not ran recent enough: ${timeSinceLast}ms`,
+        };
+      }
+      if (parsableInt.test(version)) {
+        return {
+          result: null,
+        };
+      }
+      return {
+        error: `Unknown value in check: ${version}`,
+      };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
       return {
@@ -188,44 +191,40 @@ export const health: ExpectedExports.health = {
       };
     }
   },
-  async "web-ui"(effects) {
+  async "web-ui"(effects, lastCall) {
     try {
       const fileContents = await effects.readFile({
         volumeId: "main",
         path: "./health-web",
       }).then((x) => x.trim());
-      const result = matches(fileContents)
-        .when(literal("read"), () => ({
-          "error": "Health has not ran recent enough",
-        }))
-        .when(string, (x) => {
-          if (okRegex.test(x)) {
-            return {
-              result: null,
-            };
-          }
-          const errorExec = errorRegex.exec(x);
-          if (errorExec) {
-            return {
-              error: errorExec[1],
-            };
-          }
-          return {
-            error: `Unknown file contents: ${x}`,
-          };
-        })
-        .defaultTo({
-          "error-code": [
-            61,
-            `No catching: ${JSON.stringify(fileContents)}`,
-          ] as const,
-        });
-      await effects.writeFile({
+      const metaInformation = await effects.metadata({
         volumeId: "main",
-        toWrite: "read",
-        path: "health-web",
+        path: "./health-web",
       });
-      return result;
+      const timeSinceLast = Date.now() -
+        (metaInformation.modified?.valueOf() ?? Date.now());
+      if (
+        (timeSinceLast >
+          lastCall)
+      ) {
+        return {
+          "error": `Health has not ran recent enough: ${timeSinceLast}ms`,
+        };
+      }
+      if (okRegex.test(fileContents)) {
+        return {
+          result: null,
+        };
+      }
+      const errorExec = errorRegex.exec(fileContents);
+      if (errorExec?.[1]) {
+        return {
+          error: errorExec[1],
+        };
+      }
+      return {
+        error: `Unknown file contents: ${fileContents}`,
+      };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
       return {
