@@ -14,9 +14,10 @@ RUN adduser --disabled-password syncthing_user
 
 COPY docker_files/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-COPY docker_files/health-check.sh /usr/bin
+COPY docker_files/health-web.sh /usr/bin
 COPY docker_files/watch-and-own.sh /usr/bin
 COPY docker_files/force-own.sh /usr/bin
+COPY docker_files/health-version.sh /usr/bin
 
 EXPOSE 8384/tcp
 EXPOSE 22000/tcp

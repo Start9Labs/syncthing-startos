@@ -1,12 +1,12 @@
 import matches from "https://deno.land/x/ts_matches@5.1.5/mod.ts";
-const { shape, number, string, some } = matches;
+const { shape, number, string, some, literal } = matches;
 
 import {
   Config,
   Effects,
   ExpectedExports,
   Properties,
-} from "https://start9.com/procedure/types.0.3.1.d.ts ";
+} from "https://start9.com/procedure/types.0.3.1.d.ts";
 
 const matchesStringRec = some(
   string,
@@ -150,3 +150,90 @@ export const properties: ExpectedExports.properties = async (effects) => {
   };
   return { result };
 };
+const parsableInt = string.map(Number).refine(function isInt(x): x is number {
+  return Number.isInteger(x);
+});
+const okRegex = /Ok:.+/;
+const errorRegex = /Error:\s?(.+)/;
+export const health: ExpectedExports.health = {
+  async version(effects, lastCall) {
+    try {
+      const version = await effects.readFile({
+        volumeId: "main",
+        path: "./health-version",
+      }).then((x) => x.trim());
+      const metaInformation = await effects.metadata({
+        volumeId: "main",
+        path: "./health-version",
+      });
+      const timeSinceLast = Date.now() -
+        (metaInformation.modified?.valueOf() ?? Date.now());
+      if (
+        (timeSinceLast >
+          lastCall)
+      ) {
+        return {
+          "error": `Health has not ran recent enough: ${timeSinceLast}ms`,
+        };
+      }
+      if (parsableInt.test(version)) {
+        return {
+          result: null,
+        };
+      }
+      return {
+        error: `Unknown value in check: ${version}`,
+      };
+    } catch (e) {
+      effects.error(`Health check failed: ${e}`);
+      return {
+        "error-code": [61, "No file indicating health has ran"] as const,
+      };
+    }
+  },
+  async "web-ui"(effects, lastCall) {
+    try {
+      const fileContents = await effects.readFile({
+        volumeId: "main",
+        path: "./health-web",
+      }).then((x) => x.trim());
+      const metaInformation = await effects.metadata({
+        volumeId: "main",
+        path: "./health-web",
+      });
+      const timeSinceLast = Date.now() -
+        (metaInformation.modified?.valueOf() ?? Date.now());
+      if (
+        (timeSinceLast >
+          lastCall)
+      ) {
+        return {
+          "error": `Health has not ran recent enough: ${timeSinceLast}ms`,
+        };
+      }
+      if (okRegex.test(fileContents)) {
+        return {
+          result: null,
+        };
+      }
+      const errorExec = errorRegex.exec(fileContents);
+      if (errorExec?.[1]) {
+        return {
+          error: errorExec[1],
+        };
+      }
+      return {
+        error: `Unknown file contents: ${fileContents}`,
+      };
+    } catch (e) {
+      effects.error(`Health check failed: ${e}`);
+      return {
+        "error-code": [61, "No file indicating health web has ran"] as const,
+      };
+    }
+  },
+};
+
+export const migration: ExpectedExports.migration = async () => ({
+  result: { configured: true },
+});

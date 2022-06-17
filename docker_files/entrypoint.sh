@@ -4,6 +4,8 @@ then
   exit 0
 fi
 
+rm /root/health-web
+rm /root/health-version
 mkdir /mnt/filebrowser/syncthing
 chown -R syncthing_user /mnt/filebrowser/syncthing
 su -s /bin/sh -c "HOME=/mnt/filebrowser/syncthing syncthing serve --no-restart --no-default-folder" syncthing_user &
@@ -31,5 +33,8 @@ done
 syncthing cli show system > /root/syncthing_stats.json
 
 watch-and-own.sh &
+
+health-version.sh &
+health-web.sh &
 
 wait -n
