@@ -8,6 +8,7 @@ This is a EmbassyOS wrapper for [Syncthing](https://github.com/syncthing/syncthi
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
 - [dasel](https://github.com/TomWright/dasel)
 - [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
+- [deno](https://deno.land/#installation)
 
 ## Cloning
 
