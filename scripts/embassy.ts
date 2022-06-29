@@ -104,7 +104,24 @@ const matchesSyncthingSystem = shape({
   myID: string,
 });
 
-export const properties: ExpectedExports.properties = async (effects) => {
+type UnPromise<A> = A extends Promise<infer B> ? B : never
+const noPropertiesFound: UnPromise<ReturnType<ExpectedExports.properties>> = {
+  result: {
+    version: 2,
+    data: {
+      "Not Ready": {
+        type: "string",
+        value: "Could not find properties. The service might still be starting",
+        qr: false,
+        copyable: false,
+        masked: false,
+        description: "Fallback Message When Properties could not be found"
+      }
+    }
+  }
+} as const
+
+const fetchProperties: ExpectedExports.properties = async (effects) => {
   const syncthing_system_promise = effects.readJsonFile({
     volumeId: "main",
     path: "syncthing_stats.json",
@@ -150,6 +167,14 @@ export const properties: ExpectedExports.properties = async (effects) => {
   };
   return { result };
 };
+export const properties: ExpectedExports.properties = async (effects) => {
+  try {
+    return await fetchProperties(effects)
+  }
+  catch (_e) {
+    return noPropertiesFound;
+  }
+}
 const parsableInt = string.map(Number).refine(function isInt(x): x is number {
   return Number.isInteger(x);
 });
