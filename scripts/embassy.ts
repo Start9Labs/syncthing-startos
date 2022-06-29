@@ -1,12 +1,7 @@
-import matches from "https://deno.land/x/ts_matches@5.1.5/mod.ts";
-const { shape, number, string, some, literal } = matches;
 
-import {
-  Config,
-  Effects,
-  ExpectedExports,
-  Properties,
-} from "https://start9.com/procedure/types.0.3.1.d.ts";
+import { types as T, matches } from "https://deno.land/x/embassyd_sdk@v0.3.1.0.2/mod.ts";
+const { shape, number, string, some } = matches;
+
 
 const matchesStringRec = some(
   string,
@@ -28,8 +23,8 @@ const matchesConfigFile = shape({
   password: string,
 });
 
-export const getConfig: ExpectedExports.getConfig = async (
-  effects: Effects,
+export const getConfig: T.ExpectedExports.getConfig = async (
+  effects: T.Effects,
 ) => {
   const config = await effects
     .readJsonFile({
@@ -80,9 +75,9 @@ export const getConfig: ExpectedExports.getConfig = async (
   };
 };
 
-export const setConfig: ExpectedExports.setConfig = async (
-  effects: Effects,
-  input: Config,
+export const setConfig: T.ExpectedExports.setConfig = async (
+  effects: T.Effects,
+  input: T.Config,
 ) => {
   await effects.writeJsonFile({
     path: "./config.json",
@@ -105,7 +100,7 @@ const matchesSyncthingSystem = shape({
 });
 
 type UnPromise<A> = A extends Promise<infer B> ? B : never
-const noPropertiesFound: UnPromise<ReturnType<ExpectedExports.properties>> = {
+const noPropertiesFound: UnPromise<ReturnType<T.ExpectedExports.properties>> = {
   result: {
     version: 2,
     data: {
@@ -121,7 +116,13 @@ const noPropertiesFound: UnPromise<ReturnType<ExpectedExports.properties>> = {
   }
 } as const
 
-const fetchProperties: ExpectedExports.properties = async (effects) => {
+export const properties: T.ExpectedExports.properties = async (effects) => {
+  if (await effects.exists({ volumeId: "main", path: "config.json" }) === false) {
+    return noPropertiesFound;
+  }
+  if (await effects.exists({ volumeId: "main", path: "syncthing_stats.json" }) === false) {
+    return noPropertiesFound;
+  }
   const syncthing_system_promise = effects.readJsonFile({
     volumeId: "main",
     path: "syncthing_stats.json",
@@ -136,7 +137,7 @@ const fetchProperties: ExpectedExports.properties = async (effects) => {
   );
   const config = matchesConfigFile.unsafeCast(await config_promise);
 
-  const result: Properties = {
+  const result: T.Properties = {
     version: 2,
     data: {
       "Device Id": {
@@ -167,20 +168,12 @@ const fetchProperties: ExpectedExports.properties = async (effects) => {
   };
   return { result };
 };
-export const properties: ExpectedExports.properties = async (effects) => {
-  try {
-    return await fetchProperties(effects)
-  }
-  catch (_e) {
-    return noPropertiesFound;
-  }
-}
 const parsableInt = string.map(Number).refine(function isInt(x): x is number {
   return Number.isInteger(x);
 });
 const okRegex = /Ok:.+/;
 const errorRegex = /Error:\s?(.+)/;
-export const health: ExpectedExports.health = {
+export const health: T.ExpectedExports.health = {
   async version(effects, lastCall) {
     try {
       const version = await effects.readFile({
@@ -259,6 +252,7 @@ export const health: ExpectedExports.health = {
   },
 };
 
-export const migration: ExpectedExports.migration = async () => ({
+// deno-lint-ignore require-await
+export const migration: T.ExpectedExports.migration = async () => ({
   result: { configured: true },
 });
