@@ -218,7 +218,7 @@ export const health: T.ExpectedExports.health = {
         (timeSinceLast >
           lastCall)
       ) {
-        return error(`Health has not ran recent enough: ${timeSinceLast}ms`);
+        return error(`Health check has not run recently enough: ${timeSinceLast}ms`);
       }
       if (parsableInt.test(version)) {
         return ok;
