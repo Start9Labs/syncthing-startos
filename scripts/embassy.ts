@@ -228,7 +228,7 @@ export const health: T.ExpectedExports.health = {
       };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
-      return errorCode(61, "No file indicating health has ran");
+      return errorCode(61, "Health check has never run");
     }
   },
   async "web-ui"(effects, lastCall) {
