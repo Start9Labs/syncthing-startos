@@ -228,7 +228,7 @@ export const health: T.ExpectedExports.health = {
       };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
-      return errorCode(61, "Health check has never run");
+      return errorCode(61, "Health check has never ran");
     }
   },
   async "web-ui"(effects, lastCall) {
@@ -255,7 +255,7 @@ export const health: T.ExpectedExports.health = {
         (timeSinceLast >
           lastCall)
       ) {
-        return error(`Health has not ran recent enough: ${timeSinceLast}ms`);
+        return error(`Health check has not run recently enough: ${timeSinceLast}ms`);
       }
       if (okRegex.test(fileContents)) {
         return ok;
@@ -271,7 +271,7 @@ export const health: T.ExpectedExports.health = {
       };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
-      return errorCode(61, "No file indicating health web has ran");
+      return errorCode(61, "Health check has never ran");
     }
   },
 };
