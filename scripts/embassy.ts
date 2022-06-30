@@ -1,7 +1,8 @@
-
-import { types as T, matches } from "https://deno.land/x/embassyd_sdk@v0.3.1.0.3/mod.ts";
+import {
+  matches,
+  types as T,
+} from "https://deno.land/x/embassyd_sdk@v0.3.1.0.3/mod.ts";
 const { shape, number, string, some } = matches;
-
 
 const matchesStringRec = some(
   string,
@@ -99,7 +100,7 @@ const matchesSyncthingSystem = shape({
   myID: string,
 });
 
-type UnPromise<A> = A extends Promise<infer B> ? B : never
+type UnPromise<A> = A extends Promise<infer B> ? B : never;
 const noPropertiesFound: UnPromise<ReturnType<T.ExpectedExports.properties>> = {
   result: {
     version: 2,
@@ -110,17 +111,22 @@ const noPropertiesFound: UnPromise<ReturnType<T.ExpectedExports.properties>> = {
         qr: false,
         copyable: false,
         masked: false,
-        description: "Fallback Message When Properties could not be found"
-      }
-    }
-  }
-} as const
+        description: "Fallback Message When Properties could not be found",
+      },
+    },
+  },
+} as const;
 
 export const properties: T.ExpectedExports.properties = async (effects) => {
-  if (await effects.exists({ volumeId: "main", path: "config.json" }) === false) {
+  if (
+    await effects.exists({ volumeId: "main", path: "config.json" }) === false
+  ) {
     return noPropertiesFound;
   }
-  if (await effects.exists({ volumeId: "main", path: "syncthing_stats.json" }) === false) {
+  if (
+    await effects.exists({ volumeId: "main", path: "syncthing_stats.json" }) ===
+      false
+  ) {
     return noPropertiesFound;
   }
   const syncthing_system_promise = effects.readJsonFile({
@@ -173,8 +179,30 @@ const parsableInt = string.map(Number).refine(function isInt(x): x is number {
 });
 const okRegex = /Ok:.+/;
 const errorRegex = /Error:\s?(.+)/;
+const error = (error: string) => ({ error });
+const errorCode = (code: number, error: string) => ({
+  "error-code": [code, error] as const,
+});
+const ok = { result: null };
+
+/** Call to make sure the duration is pass a minimum */
+const guardDurationAboveMinimum = (
+  input: { duration: number; minimumTime: number },
+) =>
+  (input.duration <= input.minimumTime)
+    ? Promise.reject(errorCode(60, "Starting"))
+    : null;
+
 export const health: T.ExpectedExports.health = {
   async version(effects, lastCall) {
+    try {
+      await guardDurationAboveMinimum({
+        duration: lastCall,
+        minimumTime: 10000,
+      });
+    } catch (e) {
+      return e;
+    }
     try {
       const version = await effects.readFile({
         volumeId: "main",
@@ -190,26 +218,28 @@ export const health: T.ExpectedExports.health = {
         (timeSinceLast >
           lastCall)
       ) {
-        return {
-          "error": `Health has not ran recent enough: ${timeSinceLast}ms`,
-        };
+        return error(`Health has not ran recent enough: ${timeSinceLast}ms`);
       }
       if (parsableInt.test(version)) {
-        return {
-          result: null,
-        };
+        return ok;
       }
       return {
         error: `Unknown value in check: ${version}`,
       };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
-      return {
-        "error-code": [61, "No file indicating health has ran"] as const,
-      };
+      return errorCode(61, "No file indicating health has ran");
     }
   },
   async "web-ui"(effects, lastCall) {
+    try {
+      await guardDurationAboveMinimum({
+        duration: lastCall,
+        minimumTime: 10000,
+      });
+    } catch (e) {
+      return e;
+    }
     try {
       const fileContents = await effects.readFile({
         volumeId: "main",
@@ -225,14 +255,10 @@ export const health: T.ExpectedExports.health = {
         (timeSinceLast >
           lastCall)
       ) {
-        return {
-          "error": `Health has not ran recent enough: ${timeSinceLast}ms`,
-        };
+        return error(`Health has not ran recent enough: ${timeSinceLast}ms`);
       }
       if (okRegex.test(fileContents)) {
-        return {
-          result: null,
-        };
+        return ok;
       }
       const errorExec = errorRegex.exec(fileContents);
       if (errorExec?.[1]) {
@@ -245,9 +271,7 @@ export const health: T.ExpectedExports.health = {
       };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
-      return {
-        "error-code": [61, "No file indicating health web has ran"] as const,
-      };
+      return errorCode(61, "No file indicating health web has ran");
     }
   },
 };
