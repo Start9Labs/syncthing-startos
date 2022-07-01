@@ -99,7 +99,6 @@ main:
     - entrypoint.sh
   entrypoint: tini
   image: main
-  io-format: yaml
   mounts:
     filebrowser: /mnt/filebrowser
     main: /root
