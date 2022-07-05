@@ -1,4 +1,6 @@
 import {
+  compat,
+  exists,
   matches,
   types as T,
 } from "https://deno.land/x/embassyd_sdk@v0.3.1.0.3/mod.ts";
@@ -119,12 +121,15 @@ const noPropertiesFound: UnPromise<ReturnType<T.ExpectedExports.properties>> = {
 
 export const properties: T.ExpectedExports.properties = async (effects) => {
   if (
-    await effects.exists({ volumeId: "main", path: "config.json" }) === false
+    await exists(effects, { volumeId: "main", path: "config.json" }) === false
   ) {
     return noPropertiesFound;
   }
   if (
-    await effects.exists({ volumeId: "main", path: "syncthing_stats.json" }) ===
+    await exists(effects, {
+      volumeId: "main",
+      path: "syncthing_stats.json",
+    }) ===
       false
   ) {
     return noPropertiesFound;
@@ -218,7 +223,9 @@ export const health: T.ExpectedExports.health = {
         (timeSinceLast >
           lastCall)
       ) {
-        return error(`Health check has not run recently enough: ${timeSinceLast}ms`);
+        return error(
+          `Health check has not run recently enough: ${timeSinceLast}ms`,
+        );
       }
       if (parsableInt.test(version)) {
         return ok;
@@ -255,7 +262,9 @@ export const health: T.ExpectedExports.health = {
         (timeSinceLast >
           lastCall)
       ) {
-        return error(`Health check has not run recently enough: ${timeSinceLast}ms`);
+        return error(
+          `Health check has not run recently enough: ${timeSinceLast}ms`,
+        );
       }
       if (okRegex.test(fileContents)) {
         return ok;
