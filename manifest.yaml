@@ -103,6 +103,7 @@ main:
     filebrowser: /mnt/filebrowser
     main: /root
   type: docker
+  inject: true
 marketing-site: https://syncthing.org/
 properties:
   type: script
