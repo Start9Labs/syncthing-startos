@@ -107,12 +107,11 @@ marketing-site: https://syncthing.org/
 properties:
   type: script
 release-notes: |
-  * https://github.com/syncthing/syncthing/releases/v1.20.2
-  * Switch to using new EOS apis for faster configuration and properties
+  * https://github.com/syncthing/syncthing/releases/v1.20.3
 support-site: https://github.com/syncthing/syncthing/issues
 title: Syncthing
 upstream-repo: https://github.com/syncthing/syncthing
-version: 1.20.2
+version: 1.20.3
 volumes:
   compat:
     type: assets
