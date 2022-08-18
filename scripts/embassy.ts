@@ -1,10 +1,12 @@
 import {
-  compat,
-  exists,
+  util,
   matches,
   types as T,
-} from "https://deno.land/x/embassyd_sdk@v0.3.1.0.3/mod.ts";
+} from "https://deno.land/x/embassyd_sdk@v0.3.1.1.1/mod.ts";
 const { shape, number, string, some } = matches;
+const { exists } = util;
+
+const configFilePath = "./config.json";
 
 const matchesStringRec = some(
   string,
@@ -13,8 +15,8 @@ const matchesStringRec = some(
       charset: string,
       len: number,
     },
-    ["charset"],
-  ),
+    ["charset"]
+  )
 );
 const matchesConfig = shape({
   username: matchesStringRec,
@@ -27,12 +29,12 @@ const matchesConfigFile = shape({
 });
 
 export const getConfig: T.ExpectedExports.getConfig = async (
-  effects: T.Effects,
+  effects: T.Effects
 ) => {
   const config = await effects
     .readJsonFile({
       volumeId: "main",
-      path: "config.json",
+      path: configFilePath,
     })
     .then((x) => matchesConfig.unsafeCast(x))
     .catch(() => undefined);
@@ -80,10 +82,10 @@ export const getConfig: T.ExpectedExports.getConfig = async (
 
 export const setConfig: T.ExpectedExports.setConfig = async (
   effects: T.Effects,
-  input: T.Config,
+  input: T.Config
 ) => {
   await effects.writeJsonFile({
-    path: "./config.json",
+    path: configFilePath,
     toWrite: {
       username: input?.username,
       password: input?.password,
@@ -121,16 +123,16 @@ const noPropertiesFound: UnPromise<ReturnType<T.ExpectedExports.properties>> = {
 
 export const properties: T.ExpectedExports.properties = async (effects) => {
   if (
-    await exists(effects, { volumeId: "main", path: "config.json" }) === false
+    (await exists(effects, { volumeId: "main", path: configFilePath })) ===
+    false
   ) {
     return noPropertiesFound;
   }
   if (
-    await exists(effects, {
+    (await exists(effects, {
       volumeId: "main",
       path: "syncthing_stats.json",
-    }) ===
-      false
+    })) === false
   ) {
     return noPropertiesFound;
   }
@@ -140,11 +142,11 @@ export const properties: T.ExpectedExports.properties = async (effects) => {
   });
   const config_promise = effects.readJsonFile({
     volumeId: "main",
-    path: "config.json",
+    path: configFilePath,
   });
 
   const syncthing_system = matchesSyncthingSystem.unsafeCast(
-    await syncthing_system_promise,
+    await syncthing_system_promise
   );
   const config = matchesConfigFile.unsafeCast(await config_promise);
 
@@ -184,22 +186,43 @@ const parsableInt = string.map(Number).refine(function isInt(x): x is number {
 });
 const okRegex = /Ok:.+/;
 const errorRegex = /Error:\s?(.+)/;
+const isError = shape({ error: string }).test;
+const isErrorCode = shape({ "error-code": matches.tuple(number, string) }).test;
 const error = (error: string) => ({ error });
 const errorCode = (code: number, error: string) => ({
   "error-code": [code, error] as const,
 });
 const ok = { result: null };
+const dealWithError = (e: unknown) => {
+  if (isError(e) || isErrorCode(e)) {
+    return e;
+  }
+  throw e;
+};
 
 /** Call to make sure the duration is pass a minimum */
-const guardDurationAboveMinimum = (
-  input: { duration: number; minimumTime: number },
-) =>
-  (input.duration <= input.minimumTime)
+const guardDurationAboveMinimum = (input: {
+  duration: number;
+  minimumTime: number;
+}) =>
+  input.duration <= input.minimumTime
     ? Promise.reject(errorCode(60, "Starting"))
     : null;
 
 export const health: T.ExpectedExports.health = {
   async version(effects, lastCall) {
+    return await (async () => {
+      await guardDurationAboveMinimum({
+        duration: lastCall,
+        minimumTime: 10000,
+      });
+      const data = JSON.parse(
+        await effects.readFile({
+          volumeId: "main",
+          path: configFilePath,
+        })
+      );
+    })().catch(dealWithError);
     try {
       await guardDurationAboveMinimum({
         duration: lastCall,
@@ -209,22 +232,21 @@ export const health: T.ExpectedExports.health = {
       return e;
     }
     try {
-      const version = await effects.readFile({
-        volumeId: "main",
-        path: "./health-version",
-      }).then((x) => x.trim());
+      const version = await effects
+        .readFile({
+          volumeId: "main",
+          path: "./health-version",
+        })
+        .then((x) => x.trim());
       const metaInformation = await effects.metadata({
         volumeId: "main",
         path: "./health-version",
       });
-      const timeSinceLast = Date.now() -
-        (metaInformation.modified?.valueOf() ?? Date.now());
-      if (
-        (timeSinceLast >
-          lastCall)
-      ) {
+      const timeSinceLast =
+        Date.now() - (metaInformation.modified?.valueOf() ?? Date.now());
+      if (timeSinceLast > lastCall) {
         return error(
-          `Health check has not run recently enough: ${timeSinceLast}ms`,
+          `Health check has not run recently enough: ${timeSinceLast}ms`
         );
       }
       if (parsableInt.test(version)) {
@@ -248,22 +270,21 @@ export const health: T.ExpectedExports.health = {
       return e;
     }
     try {
-      const fileContents = await effects.readFile({
-        volumeId: "main",
-        path: "./health-web",
-      }).then((x) => x.trim());
+      const fileContents = await effects
+        .readFile({
+          volumeId: "main",
+          path: "./health-web",
+        })
+        .then((x) => x.trim());
       const metaInformation = await effects.metadata({
         volumeId: "main",
         path: "./health-web",
       });
-      const timeSinceLast = Date.now() -
-        (metaInformation.modified?.valueOf() ?? Date.now());
-      if (
-        (timeSinceLast >
-          lastCall)
-      ) {
+      const timeSinceLast =
+        Date.now() - (metaInformation.modified?.valueOf() ?? Date.now());
+      if (timeSinceLast > lastCall) {
         return error(
-          `Health check has not run recently enough: ${timeSinceLast}ms`,
+          `Health check has not run recently enough: ${timeSinceLast}ms`
         );
       }
       if (okRegex.test(fileContents)) {

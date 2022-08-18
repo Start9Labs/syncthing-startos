@@ -94,15 +94,16 @@ interfaces:
         "22000": "22000"
     ui: false
 license: apache
-main:
-  args:
-    - entrypoint.sh
-  entrypoint: tini
+container:
   image: main
   mounts:
     filebrowser: /mnt/filebrowser
     main: /root
-  type: docker
+main:
+  type: docker-inject
+  args:
+    - entrypoint.sh
+  entrypoint: tini
 marketing-site: https://syncthing.org/
 properties:
   type: script
@@ -131,3 +132,20 @@ migrations:
   to:
     "*":
       type: script
+
+actions:
+  test:
+    name: "test"
+    description: "TESTING DO NOT USE"
+    allowed-statuses:
+      - "running"
+      - "stopped"
+    implementation:
+      type: docker-inject
+      args: 
+        - -c
+        - sleep 100; echo '"I work"'
+      entrypoint: sh
+
+      io-format: json
+    input-spec: {}
