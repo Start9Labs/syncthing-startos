@@ -235,7 +235,7 @@ export const health: T.ExpectedExports.health = {
       };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
-      return errorCode(61, "Health check has never ran");
+      return errorCode(61, "Health check has never run");
     }
   },
   async "web-ui"(effects, lastCall) {
@@ -280,7 +280,7 @@ export const health: T.ExpectedExports.health = {
       };
     } catch (e) {
       effects.error(`Health check failed: ${e}`);
-      return errorCode(61, "Health check has never ran");
+      return errorCode(61, "Health check has never run");
     }
   },
 };
