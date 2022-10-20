@@ -1,8 +1,10 @@
 import {
-  util,
   matches,
   types as T,
-} from "https://deno.land/x/embassyd_sdk@v0.3.1.1.1/mod.ts";
+  util,
+  // } from "https://deno.land/x/embassyd_sdk@v0.3.1.1.1/mod.ts";
+} from "../../embassy-sdk-ts/mod.ts";
+
 const { shape, number, string, some } = matches;
 const { exists } = util;
 
@@ -15,8 +17,8 @@ const matchesStringRec = some(
       charset: string,
       len: number,
     },
-    ["charset"]
-  )
+    ["charset"],
+  ),
 );
 const matchesConfig = shape({
   username: matchesStringRec,
@@ -29,7 +31,7 @@ const matchesConfigFile = shape({
 });
 
 export const getConfig: T.ExpectedExports.getConfig = async (
-  effects: T.Effects
+  effects: T.Effects,
 ) => {
   const config = await effects
     .readJsonFile({
@@ -82,7 +84,7 @@ export const getConfig: T.ExpectedExports.getConfig = async (
 
 export const setConfig: T.ExpectedExports.setConfig = async (
   effects: T.Effects,
-  input: T.Config
+  input: T.Config,
 ) => {
   await effects.writeJsonFile({
     path: configFilePath,
@@ -146,7 +148,7 @@ export const properties: T.ExpectedExports.properties = async (effects) => {
   });
 
   const syncthing_system = matchesSyncthingSystem.unsafeCast(
-    await syncthing_system_promise
+    await syncthing_system_promise,
   );
   const config = matchesConfigFile.unsafeCast(await config_promise);
 
@@ -208,57 +210,39 @@ const guardDurationAboveMinimum = (input: {
   input.duration <= input.minimumTime
     ? Promise.reject(errorCode(60, "Starting"))
     : null;
-
+function safeParse(x: string) {
+  try {
+    return JSON.parse(x)
+  }
+  catch (e) {
+    return undefined
+  }
+}
 export const health: T.ExpectedExports.health = {
   async version(effects, lastCall) {
-    return await (async () => {
-      await guardDurationAboveMinimum({
-        duration: lastCall,
-        minimumTime: 10000,
-      });
-      const data = JSON.parse(
-        await effects.readFile({
-          volumeId: "main",
-          path: configFilePath,
-        })
-      );
-    })().catch(dealWithError);
     try {
       await guardDurationAboveMinimum({
         duration: lastCall,
         minimumTime: 10000,
       });
-    } catch (e) {
-      return e;
-    }
-    try {
-      const version = await effects
-        .readFile({
-          volumeId: "main",
-          path: "./health-version",
-        })
-        .then((x) => x.trim());
-      const metaInformation = await effects.metadata({
-        volumeId: "main",
-        path: "./health-version",
-      });
-      const timeSinceLast =
-        Date.now() - (metaInformation.modified?.valueOf() ?? Date.now());
-      if (timeSinceLast > lastCall) {
-        return error(
-          `Health check has not run recently enough: ${timeSinceLast}ms`
-        );
+      const output = await (effects as any).runCommand({
+        command: "sh",
+        args: ["-c", "HOME=/mnt/filebrowser/syncthing syncthing cli config version get"],
+      })
+      if ("ok" in output && safeParse(output['ok']) === 36) {
+        return ok
+      } else if ("err" in output) {
+        const err = safeParse(output)
+
+        if (0 in err && 1 in err && typeof err[0] === 'number' && typeof err[1]) {
+          return errorCode(err[0], err[1])
+        }
       }
-      if (parsableInt.test(version)) {
-        return ok;
-      }
-      return {
-        error: `Unknown value in check: ${version}`,
-      };
+      return ok
     } catch (e) {
-      effects.error(`Health check failed: ${e}`);
-      return errorCode(61, "Health check has never ran");
+      dealWithError(e)
     }
+    return error("Could not get the current status");
   },
   async "web-ui"(effects, lastCall) {
     try {
@@ -280,11 +264,11 @@ export const health: T.ExpectedExports.health = {
         volumeId: "main",
         path: "./health-web",
       });
-      const timeSinceLast =
-        Date.now() - (metaInformation.modified?.valueOf() ?? Date.now());
+      const timeSinceLast = Date.now() -
+        (metaInformation.modified?.valueOf() ?? Date.now());
       if (timeSinceLast > lastCall) {
         return error(
-          `Health check has not run recently enough: ${timeSinceLast}ms`
+          `Health check has not run recently enough: ${timeSinceLast}ms`,
         );
       }
       if (okRegex.test(fileContents)) {
@@ -310,3 +294,85 @@ export const health: T.ExpectedExports.health = {
 export const migration: T.ExpectedExports.migration = async () => ({
   result: { configured: true },
 });
+function noOp() { }
+
+export const main = async (effects: T.Effects) => {
+  effects.error("BLUJ Starting main")
+  await effects.readFile({
+    volumeId: "main",
+    path: "healt-web",
+  }).catch(noOp)
+  await effects.readFile({
+    volumeId: "main",
+    path: "healt-version",
+  }).catch(noOp)
+
+  await effects.createDir({
+    volumeId: "filebrowser",
+    path: "syncthing"
+  })
+
+  await effects.runCommand({
+    command: "chown",
+    args: "-R syncthing_user /mnt/filebrowser/syncthing".split(' '),
+  })
+
+  const syncthingServer = effects.runCommand({
+    command: "su",
+    args: ["-s", "/bin/sh", "-c", "HOME=/mnt/filebrowser/syncthing syncthing serve --no-restart --no-default-folder", "syncthing_user"],
+    timeoutMillis: Number.MAX_SAFE_INTEGER
+  })
+
+  const runCm = (command: string) => {
+    return effects.runCommand({ command: "sh", args: ["-c", `HOME=/mnt/filebrowser/syncthing  ${command}`] }).then(x => {
+      effects.error(`BLUJ Returned for ${command} is ${JSON.stringify(x)}`)
+      return x;
+    }).then(x => matches.shape({ Ok: matches.string }).unsafeCast(x)).then(({ Ok }) => Ok)
+  }
+
+  const testSyncthingStillStarting = async () => /no such file or directory/.test(await runCm(` syncthing cli show system`)) || /connection refused/.test(await runCm(` syncthing cli show system`)) || /connection refused/.test(await runCm(` syncthing cli config gui user get`))
+
+  while (await testSyncthingStillStarting()) {
+    await effects.sleep(200)
+    await runCm("echo \"I'm sleeping\"")
+  }
+  await runCm("echo \"Syncthing settings\"")
+
+  await effects.sleep(100)
+  await runCm(`syncthing cli config gui raw-address set -- 0.0.0.0:8384`)
+  await runCm(`syncthing cli config gui user set -- $(jq -r '.username' /root/config.json)`)
+  await runCm(`syncthing cli config gui password set -- $(jq -r '.password' /root/config.json)`)
+  await runCm(`syncthing cli config options uraccepted set -- -1`)
+  await runCm(`syncthing cli config defaults device auto-accept-folders set true`)
+  await runCm(`syncthing cli config defaults device introducer set true`)
+
+  while (await testSyncthingStillStarting()) {
+    await effects.sleep(200)
+    await runCm("echo \"I'm sleeping\"")
+  }
+  await runCm("syncthing cli show system > /root/syncthing_stats.json")
+  const watchAndOwn = effects.runCommand({ command: "watch-and-own.sh", args: [], timeoutMillis: Number.MAX_SAFE_INTEGER })
+  effects.error("BLUJ waiting")
+  await Promise.race([syncthingServer, watchAndOwn])
+}
+
+export const action: T.ExpectedExports.action = {
+  async test(effects, config) {
+    const start = Date.now();
+    const returned = await effects.runCommand({
+      command: "sleep",
+      args: ["infinity"],
+      timeoutMillis: 300
+    });
+    const end = Date.now();
+    return {
+      result: {
+        version: "0",
+        message: `Things have worked in ${end - start}ms`,
+        value: JSON.stringify(returned),
+        copyable: true,
+        qr: true,
+      },
+    };
+  },
+};

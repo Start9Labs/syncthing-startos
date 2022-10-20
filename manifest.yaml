@@ -100,10 +100,7 @@ container:
     filebrowser: /mnt/filebrowser
     main: /root
 main:
-  type: docker-inject
-  args:
-    - entrypoint.sh
-  entrypoint: tini
+  type: script
 marketing-site: https://syncthing.org/
 properties:
   type: script
@@ -141,11 +138,5 @@ actions:
       - "running"
       - "stopped"
     implementation:
-      type: docker-inject
-      args: 
-        - -c
-        - sleep 100; echo '"I work"'
-      entrypoint: sh
-
-      io-format: json
+      type: script
     input-spec: {}
