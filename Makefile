@@ -1,33 +1,36 @@
-VERSION_TAG := $(shell git describe --abbrev=0 --tags)
-VERSION := $(VERSION_TAG:v%=%)
-EMVER := $(shell dasel -f manifest.yaml ".version")
+PKG_ID := $(shell yq e ".id" manifest.yaml)
+PKG_VERSION := $(shell yq e ".version" manifest.yaml)
+TS_FILES := $(shell find ./ -name \*.ts)
 
-SYNCTHING_VERSION := "v1.19.1"
-
+# delete the target of a rule if it has changed and its recipe exits with a nonzero exit status
 .DELETE_ON_ERROR:
 
 all: verify
 
-install: syncthing.s9pk
-	embassy-cli package install syncthing.s9pk
+verify: $(PKG_ID).s9pk
+	embassy-sdk verify s9pk $(PKG_ID).s9pk
 
-syncthing.s9pk: manifest.yaml image.tar INSTRUCTIONS.md LICENSE $(ASSET_PATHS) scripts/embassy.js
-	embassy-sdk pack
-	
-verify: syncthing.s9pk
-	embassy-sdk verify s9pk syncthing.s9pk
+# assumes /etc/embassy/config.yaml exists on local system with `host: "http://embassy-server-name.local"` configured
+install: $(PKG_ID).s9pk
+	embassy-cli package install $(PKG_ID).s9pk
 
-image.tar: Dockerfile templates
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/syncthing/main:${EMVER} --platform=linux/arm64/v8 -o type=docker,dest=image.tar .
+clean:
+	rm -rf docker-images
+	rm -f image.tar
+	rm -f $(PKG_ID).s9pk
+	rm -f scripts/*.js
 
-scripts/embassy.js: scripts/embassy.ts
+scripts/embassy.js: $(TS_FILES)
 	deno bundle scripts/embassy.ts scripts/embassy.js
 
-scripts/embassy.ts: .
+docker-images/aarch64.tar: Dockerfile
+	mkdir -p docker-images
+	docker buildx build --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --platform=linux/arm64 -o type=docker,dest=docker-images/aarch64.tar .
 
-templates: 
+docker-images/x86_64.tar: Dockerfile
+	mkdir -p docker-images
+	docker buildx build --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --platform=linux/amd64 -o type=docker,dest=docker-images/x86_64.tar .
 
-check_manifest: manifest.yaml Makefile
-	test $(shell dasel -f manifest.yaml ".version") == "$(VERSION)" || { echo "failure!"; exit 1; }
-	test $(shell dasel -f manifest.yaml ".release-notes") == "https://github.com/syncthing/syncthing/releases/$(SYNCTHING_VERSION)"  || { echo "failure!"; exit 1; }
-	echo "Manifest is good"
+$(PKG_ID).s9pk: manifest.yaml INSTRUCTIONS.md icon.png LICENSE scripts/embassy.js docker-images/aarch64.tar docker-images/x86_64.tar
+	if ! [ -z "$(ARCH)" ]; then cp docker-images/$(ARCH).tar image.tar; fi
+	embassy-sdk pack

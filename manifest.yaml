@@ -94,22 +94,23 @@ interfaces:
         "22000": "22000"
     ui: false
 license: apache
-container:
-  image: main
-  mounts:
-    filebrowser: /mnt/filebrowser
-    main: /root
+containers:
+  main:
+    image: main
+    mounts:
+      filebrowser: /mnt/filebrowser
+      main: /root
 main:
   type: script
 marketing-site: https://syncthing.org/
 properties:
   type: script
 release-notes: |
-  * https://github.com/syncthing/syncthing/releases/v1.20.3
+  * https://github.com/syncthing/syncthing/releases/v1.22.0
 support-site: https://github.com/syncthing/syncthing/issues
 title: Syncthing
 upstream-repo: https://github.com/syncthing/syncthing
-version: 1.20.3
+version: 1.22.0
 volumes:
   compat:
     type: assets
@@ -126,17 +127,10 @@ migrations:
   from:
     "*":
       type: script
+      args: ["from"]
   to:
     "*":
       type: script
+      args: ["to"]
 
-actions:
-  test:
-    name: "test"
-    description: "TESTING DO NOT USE"
-    allowed-statuses:
-      - "running"
-      - "stopped"
-    implementation:
-      type: script
-    input-spec: {}
+actions: {}
