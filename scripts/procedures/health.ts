@@ -204,7 +204,7 @@ export const health: T.ExpectedExports.health = {
         // deno-fmt-ignore
         // prettier-fmt-ignore
         webResponse.status === 401 ? error(`Authorization issue`) :
-        webResponse.status === 200 ? error(`Could not fetch site`) : 
+        webResponse.status !== 200 ? error(`Could not fetch site`) : 
         ok
       )
       .catch((e) =>
