@@ -9,6 +9,7 @@ COPY --from=0 /bin/syncthing /usr/bin/
 RUN adduser --disabled-password syncthing_user
 
 COPY docker_files/watch-and-own.sh /usr/bin
+COPY docker_files/version-old.sh /usr/bin
 
 EXPOSE 8384/tcp
 EXPOSE 22000/tcp

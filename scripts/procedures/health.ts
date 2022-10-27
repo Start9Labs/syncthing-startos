@@ -181,6 +181,16 @@ export const health: T.ExpectedExports.health = {
     }
     return error("Could not get the current status");
   },
+  async "version-old"(effects) {
+    const result = await effects.runCommand({
+      command: "version-old.sh",
+      args: [],
+    });
+    if ("result" in result) {
+      return { result: null };
+    }
+    return result;
+  },
   "web-ui"(effects, lastCall) {
     return effects
       .readFile({

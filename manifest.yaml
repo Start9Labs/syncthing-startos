@@ -53,6 +53,10 @@ health-checks:
     name: Sync Connection
     success-message: Syncthing is running and connected with filebrowser folder
     type: script
+  version-old:
+    name: Sync Connection Via Shell
+    success-message: Syncthing is running and connected with filebrowser folder using shell
+    type: script
   web-ui:
     name: Web Interface
     success-message: Syncthing is ready to be visited in your browser.
