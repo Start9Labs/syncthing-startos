@@ -31,6 +31,6 @@ docker-images/x86_64.tar: Dockerfile
 	mkdir -p docker-images
 	docker buildx build --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --platform=linux/amd64 -o type=docker,dest=docker-images/x86_64.tar .
 
-$(PKG_ID).s9pk: manifest.yaml INSTRUCTIONS.md icon.png LICENSE scripts/embassy.js docker-images/aarch64.tar docker-images/x86_64.tar
+$(PKG_ID).s9pk: manifest.yaml INSTRUCTIONS.md icon.png LICENSE.md scripts/embassy.js docker-images/aarch64.tar docker-images/x86_64.tar
 	if ! [ -z "$(ARCH)" ]; then cp docker-images/$(ARCH).tar image.tar; fi
 	embassy-sdk pack

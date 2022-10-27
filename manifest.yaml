@@ -1,10 +1,5 @@
 actions: {}
 alerts: {}
-assets:
-  docker-images: image.tar
-  icon: icon.png
-  instructions: INSTRUCTIONS.md
-  license: LICENSE
 backup:
   create:
     args:
