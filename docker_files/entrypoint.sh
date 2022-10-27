@@ -8,7 +8,7 @@ rm /root/health-web
 rm /root/health-version
 mkdir /mnt/filebrowser/syncthing
 chown -R syncthing_user /mnt/filebrowser/syncthing
-su -s /bin/sh -c "HOME=/mnt/filebrowser/syncthing syncthing serve --no-restart --no-default-folder" syncthing_user &
+su -s /bin/sh -c "HOME=/mnt/filebrowser/syncthing syncthing serve --no-restart --reset-deltas --no-default-folder" syncthing_user &
 syncthing_process=$!
 export HOME=/mnt/filebrowser/syncthing
 
