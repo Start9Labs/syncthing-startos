@@ -4,3 +4,5 @@ syncthing.s9pk
 makeStats
 scripts/embassy.js
 docker-images
+.DS_Store
+.vscode/

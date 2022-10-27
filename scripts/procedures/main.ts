@@ -1,5 +1,5 @@
 import { matches, types as T, util } from "../deps.ts";
-const { ok, error, errorCode } = util;
+const { ok } = util;
 
 export const main: T.ExpectedExports.main = async (effects: T.Effects) => {
   await effects.createDir({
