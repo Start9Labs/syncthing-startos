@@ -1,10 +1,5 @@
 actions: {}
 alerts: {}
-assets:
-  docker-images: image.tar
-  icon: icon.png
-  instructions: INSTRUCTIONS.md
-  license: LICENSE
 backup:
   create:
     args:
@@ -94,25 +89,24 @@ interfaces:
         "22000": "22000"
     ui: false
 license: apache
+containers:
+  main:
+    image: main
+    mounts:
+      filebrowser: /mnt/filebrowser
+      main: /root
 main:
-  args:
-    - entrypoint.sh
-  entrypoint: tini
-  image: main
-  mounts:
-    filebrowser: /mnt/filebrowser
-    main: /root
-  type: docker
+  type: script
 marketing-site: https://syncthing.org/
 properties:
   type: script
 release-notes: |
-  * https://github.com/syncthing/syncthing/releases/v1.20.2
-  * Switch to using new EOS apis for faster configuration and properties
+  * https://github.com/syncthing/syncthing/releases/v1.22.1
+  * Using health checks using commands in js via the 0.3.3 eos release.
 support-site: https://github.com/syncthing/syncthing/issues
 title: Syncthing
 upstream-repo: https://github.com/syncthing/syncthing
-version: 1.20.2
+version: 1.22.1
 volumes:
   compat:
     type: assets
@@ -129,6 +123,10 @@ migrations:
   from:
     "*":
       type: script
+      args: ["from"]
   to:
     "*":
       type: script
+      args: ["to"]
+
+actions: {}

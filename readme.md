@@ -6,7 +6,6 @@ This is a EmbassyOS wrapper for [Syncthing](https://github.com/syncthing/syncthi
 
 - [docker](https://docs.docker.com/get-docker)
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
-- [dasel](https://github.com/TomWright/dasel)
 - [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 - [deno](https://deno.land/#installation)
 
@@ -19,12 +18,13 @@ cd syncthing-wrapper
 
 ## Building
 
-```
+```sh
 make
+# If we just want to build old
+make ARCH=aarch64
 ```
 
 ## Side Loading on Embassy
-
 
 ```sh
 scp syncthing.s9pk root@embassy-<id>.local:/tmp # Copying our file across
