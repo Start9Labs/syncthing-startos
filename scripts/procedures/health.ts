@@ -194,9 +194,8 @@ export const health: T.ExpectedExports.health = {
       ).then((config) =>
         effects.fetch("http://syncthing.embassy:8384", {
           headers: {
-            "Authorization": `Basic ${
-              Base64.encode(`${config.username}:${config.password}`)
-            }`,
+            "Authorization": `Basic ${Base64.encode(`${config.username}:${config.password}`)
+              }`,
           },
         })
       )
@@ -204,8 +203,8 @@ export const health: T.ExpectedExports.health = {
         // deno-fmt-ignore
         // prettier-fmt-ignore
         webResponse.status === 401 ? error(`Authorization issue`) :
-        webResponse.status !== 200 ? error(`Could not fetch site`) : 
-        ok
+          webResponse.status !== 200 ? error(`Could not fetch site`) :
+            ok
       )
       .catch((e) =>
         guardDurationAboveMinimum({

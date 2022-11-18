@@ -1,6 +1,22 @@
 import { matches, types as T, util } from "../deps.ts";
 const { ok } = util;
 
+const { shape, string, tuple, number, matches: match } = matches;
+
+const okMatch = shape({ result: string })
+const errorCodeMatch = shape({ "error-code": tuple(number, string) })
+const errorMatch = shape({ error: string })
+
+
+
+function toMessage(response: unknown) {
+  return match(response)
+    .when(okMatch, ({ result }) => result)
+    .when(errorCodeMatch, (resp) => resp["error-code"][1])
+    .when(errorMatch, ({ error }) => error)
+    .defaultTo("")
+}
+
 export const main: T.ExpectedExports.main = async (effects: T.Effects) => {
   await effects.createDir({
     volumeId: "filebrowser",
@@ -23,13 +39,17 @@ export const main: T.ExpectedExports.main = async (effects: T.Effects) => {
     ],
   });
   const runCm = (command: string) => {
+    let response: unknown;
     return effects.runCommand({
       command: "sh",
       args: ["-c", `HOME=/mnt/filebrowser/syncthing  ${command}`],
     }).then((x) => {
+      response = x;
       return x;
-    }).then((x) => matches.shape({ result: matches.string }).unsafeCast(x))
-      .then(({ result }) => result);
+    }).then(toMessage)
+      .catch(e => {
+        throw new Error(`Could not figure it out for (${command}) and response = (${JSON.stringify(response)})`);
+      });
   };
 
   const testSyncthingStillStarting = async () =>
@@ -43,6 +63,7 @@ export const main: T.ExpectedExports.main = async (effects: T.Effects) => {
   while (await testSyncthingStillStarting()) {
     await effects.sleep(200);
     await runCm('echo "I\'m sleeping"');
+
   }
   await runCm('echo "Syncthing settings"');
 
@@ -63,6 +84,7 @@ export const main: T.ExpectedExports.main = async (effects: T.Effects) => {
   while (await testSyncthingStillStarting()) {
     await effects.sleep(200);
     await runCm('echo "I\'m sleeping"');
+
   }
   await runCm("syncthing cli show system > /root/syncthing_stats.json");
   const watchAndOwn = effects.runDaemon({ command: "watch-and-own.sh" });
