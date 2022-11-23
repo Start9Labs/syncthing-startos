@@ -147,39 +147,48 @@ function safeParse(x: string) {
     return undefined;
   }
 }
+const parsableInt = string.map(Number).refine(function isInt(x): x is number {
+  return Number.isInteger(x);
+});
 export const health: T.ExpectedExports.health = {
   async version(effects, lastCall) {
     try {
-      const output = await effects.runCommand({
-        command: "sh",
-        args: [
-          "-c",
-          "HOME=/mnt/filebrowser/syncthing syncthing cli config version get",
-        ],
+      await guardDurationAboveMinimum({
+        duration: lastCall,
+        minimumTime: 10000,
       });
-      if ("ok" in output && safeParse(output["ok"]) === 36) {
-        return ok;
-      } else if ("err" in output) {
-        const err = safeParse(output);
-
-        if (
-          0 in err && 1 in err && typeof err[0] === "number" && typeof err[1]
-        ) {
-          return errorCode(err[0], err[1]);
-        }
-      }
-      return ok;
-    } catch (_e) {
-      try {
-        await guardDurationAboveMinimum({
-          duration: lastCall,
-          minimumTime: 10000,
-        });
-      } catch (e2) {
-        dealWithError(e2);
-      }
+    } catch (e) {
+      return e;
     }
-    return error("Could not get the current status");
+    try {
+      const version = await effects.readFile({
+        volumeId: "main",
+        path: "./health-version",
+      }).then((x) => x.trim());
+      const metaInformation = await effects.metadata({
+        volumeId: "main",
+        path: "./health-version",
+      });
+      const timeSinceLast = Date.now() -
+        (metaInformation.modified?.valueOf() ?? Date.now());
+      if (
+        (timeSinceLast >
+          lastCall)
+      ) {
+        return error(
+          `Health check has not run recently enough: ${timeSinceLast}ms`,
+        );
+      }
+      if (parsableInt.test(version)) {
+        return ok;
+      }
+      return {
+        error: `Unknown value in check: ${version}`,
+      };
+    } catch (e) {
+      effects.error(`Health check failed: ${e}`);
+      return errorCode(61, "Health check has never run");
+    }
   },
   "web-ui"(effects, lastCall) {
     return effects
@@ -194,8 +203,9 @@ export const health: T.ExpectedExports.health = {
       ).then((config) =>
         effects.fetch("http://syncthing.embassy:8384", {
           headers: {
-            "Authorization": `Basic ${Base64.encode(`${config.username}:${config.password}`)
-              }`,
+            "Authorization": `Basic ${
+              Base64.encode(`${config.username}:${config.password}`)
+            }`,
           },
         })
       )
