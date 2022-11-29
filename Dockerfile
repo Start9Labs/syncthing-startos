@@ -9,7 +9,7 @@ RUN apk add --no-cache inotify-tools
 
 ARG PLATFORM
 
-RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/tag/v4.30.4/latest/download/yq_linux_${PLATFORM} && chmod +x /usr/local/bin/yq
+RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${PLATFORM} && chmod +x /usr/local/bin/yq
 
 COPY --from=0 /bin/syncthing /usr/bin/
 
