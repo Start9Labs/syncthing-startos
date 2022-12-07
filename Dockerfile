@@ -1,12 +1,15 @@
-FROM syncthing/syncthing:1.20.2
+FROM syncthing/syncthing:1.22.1
 
 FROM alpine:3.15
 
 RUN apk add --no-cache tini
-RUN apk add --no-cache yq
 RUN apk add --no-cache jq
 RUN apk add --no-cache curl
 RUN apk add --no-cache inotify-tools
+
+ARG PLATFORM
+
+RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${PLATFORM} && chmod +x /usr/local/bin/yq
 
 COPY --from=0 /bin/syncthing /usr/bin/
 
