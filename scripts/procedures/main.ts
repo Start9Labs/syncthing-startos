@@ -4,13 +4,13 @@ const { ok } = util;
 const { shape, string, tuple, number, matches: match } = matches;
 
 const okMatch = shape({ result: string });
-const errorCodeMatch = shape({ "error-code": tuple(number, string) });
+const errorCodeMatch = shape({ "error-code": tuple(number, string.optional()) });
 const errorMatch = shape({ error: string });
 
 function toMessage(response: unknown) {
   return match(response)
     .when(okMatch, ({ result }) => result)
-    .when(errorCodeMatch, (resp) => resp["error-code"][1])
+    .when(errorCodeMatch, (resp) => `${resp["error-code"][0]}: ${resp["error-code"][1]}`)
     .when(errorMatch, ({ error }) => error)
     .defaultTo("");
 }
@@ -45,11 +45,14 @@ export const main: T.ExpectedExports.main = async (effects: T.Effects) => {
       })
       .then((x) => {
         response = x;
+        effects.error(`BLUJ this is the response ${JSON.stringify(x)} from (${command})`);
         return x;
       })
       .then(toMessage)
       .catch((e) => {
-        throw new Error(`Could not figure it out for (${command}) and response = (${JSON.stringify(response)})`);
+        throw new Error(
+          `Could not figure it out for (${command}) and response = (${JSON.stringify(response)}) with error (${e})`
+        );
       });
   };
 

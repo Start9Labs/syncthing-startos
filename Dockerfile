@@ -3,6 +3,7 @@ FROM syncthing/syncthing:1.22.1
 FROM alpine:3.15
 
 RUN apk add --no-cache yq
+RUN apk add --no-cache inotify-tools
 
 ARG PLATFORM
 
