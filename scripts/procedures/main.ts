@@ -45,7 +45,6 @@ export const main: T.ExpectedExports.main = async (effects: T.Effects) => {
       })
       .then((x) => {
         response = x;
-        effects.error(`BLUJ this is the response ${JSON.stringify(x)} from (${command})`);
         return x;
       })
       .then(toMessage)
