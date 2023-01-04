@@ -30,8 +30,7 @@ const Base64 = {
         enc4 = 64;
       }
 
-      output =
-        output +
+      output = output +
         this._keyStr.charAt(enc1) +
         this._keyStr.charAt(enc2) +
         this._keyStr.charAt(enc3) +
@@ -117,7 +116,9 @@ const Base64 = {
       } else {
         c2 = utftext.charCodeAt(i + 1);
         c3 = utftext.charCodeAt(i + 2);
-        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+        string += String.fromCharCode(
+          ((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63),
+        );
         i += 3;
       }
     }
@@ -134,8 +135,12 @@ const dealWithError = (e: unknown) => {
 };
 
 /** Call to make sure the duration is pass a minimum */
-const guardDurationAboveMinimum = (input: { duration: number; minimumTime: number }) =>
-  input.duration <= input.minimumTime ? Promise.reject(errorCode(60, "Starting")) : Promise.resolve(null);
+const guardDurationAboveMinimum = (
+  input: { duration: number; minimumTime: number },
+) =>
+  input.duration <= input.minimumTime
+    ? Promise.reject(errorCode(60, "Starting"))
+    : Promise.resolve(null);
 function safeParse(x: string) {
   try {
     return JSON.parse(x);
@@ -143,22 +148,24 @@ function safeParse(x: string) {
     return undefined;
   }
 }
-const parsableInt = string.map(Number).refine(function isInt(x): x is number {
-  return Number.isInteger(x);
-});
 export const health: T.ExpectedExports.health = {
   async version(effects, lastCall) {
     try {
       const output = await effects.runCommand({
         command: "sh",
-        args: ["-c", "HOME=/mnt/filebrowser/syncthing syncthing cli config version get"],
+        args: [
+          "-c",
+          "HOME=/mnt/filebrowser/syncthing syncthing cli config version get",
+        ],
       });
       if ("ok" in output && safeParse(String(output["ok"])) === 36) {
         return ok;
       } else if ("err" in output) {
         const err = safeParse(String(output));
 
-        if (0 in err && 1 in err && typeof err[0] === "number" && typeof err[1]) {
+        if (
+          0 in err && 1 in err && typeof err[0] === "number" && typeof err[1]
+        ) {
           return errorCode(err[0], err[1]);
         }
       }
@@ -182,11 +189,16 @@ export const health: T.ExpectedExports.health = {
         path: "./start9/config.yaml",
       })
       .then((x) => YAML.parse(x))
-      .then((x) => matches.shape({ username: matches.string, password: matches.string }).unsafeCast(x))
+      .then((x) =>
+        matches.shape({ username: matches.string, password: matches.string })
+          .unsafeCast(x)
+      )
       .then((config) =>
         effects.fetch("http://syncthing.embassy:8384", {
           headers: {
-            Authorization: `Basic ${Base64.encode(`${config.username}:${config.password}`)}`,
+            Authorization: `Basic ${
+              Base64.encode(`${config.username}:${config.password}`)
+            }`,
           },
         })
       )
@@ -208,7 +220,7 @@ export const health: T.ExpectedExports.health = {
             effects.error(`Health check failed: ${e}`);
             return errorCode(61, "Health check has never ran");
           },
-          (_) => e
+          (_) => e,
         )
       );
   },
