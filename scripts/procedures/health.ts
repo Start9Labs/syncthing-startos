@@ -31,8 +31,10 @@ const Base64 = {
       }
 
       output = output +
-        this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
-        this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+        this._keyStr.charAt(enc1) +
+        this._keyStr.charAt(enc2) +
+        this._keyStr.charAt(enc3) +
+        this._keyStr.charAt(enc4);
     }
     return output;
   },
@@ -81,7 +83,7 @@ const Base64 = {
 
       if (c < 128) {
         utftext += String.fromCharCode(c);
-      } else if ((c > 127) && (c < 2048)) {
+      } else if (c > 127 && c < 2048) {
         utftext += String.fromCharCode((c >> 6) | 192);
         utftext += String.fromCharCode((c & 63) | 128);
       } else {
@@ -107,7 +109,7 @@ const Base64 = {
       if (c < 128) {
         string += String.fromCharCode(c);
         i++;
-      } else if ((c > 191) && (c < 224)) {
+      } else if (c > 191 && c < 224) {
         c2 = utftext.charCodeAt(i + 1);
         string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
         i += 2;
@@ -133,10 +135,9 @@ const dealWithError = (e: unknown) => {
 };
 
 /** Call to make sure the duration is pass a minimum */
-const guardDurationAboveMinimum = (input: {
-  duration: number;
-  minimumTime: number;
-}) =>
+const guardDurationAboveMinimum = (
+  input: { duration: number; minimumTime: number },
+) =>
   input.duration <= input.minimumTime
     ? Promise.reject(errorCode(60, "Starting"))
     : Promise.resolve(null);
@@ -147,48 +148,39 @@ function safeParse(x: string) {
     return undefined;
   }
 }
-const parsableInt = string.map(Number).refine(function isInt(x): x is number {
-  return Number.isInteger(x);
-});
 export const health: T.ExpectedExports.health = {
   async version(effects, lastCall) {
     try {
-      await guardDurationAboveMinimum({
-        duration: lastCall,
-        minimumTime: 10000,
+      const output = await effects.runCommand({
+        command: "sh",
+        args: [
+          "-c",
+          "HOME=/mnt/filebrowser/syncthing syncthing cli config version get",
+        ],
       });
-    } catch (e) {
-      return e;
-    }
-    try {
-      const version = await effects.readFile({
-        volumeId: "main",
-        path: "./health-version",
-      }).then((x) => x.trim());
-      const metaInformation = await effects.metadata({
-        volumeId: "main",
-        path: "./health-version",
-      });
-      const timeSinceLast = Date.now() -
-        (metaInformation.modified?.valueOf() ?? Date.now());
-      if (
-        (timeSinceLast >
-          lastCall)
-      ) {
-        return error(
-          `Health check has not run recently enough: ${timeSinceLast}ms`,
-        );
-      }
-      if (parsableInt.test(version)) {
+      if ("ok" in output && safeParse(String(output["ok"])) === 36) {
         return ok;
+      } else if ("err" in output) {
+        const err = safeParse(String(output));
+
+        if (
+          0 in err && 1 in err && typeof err[0] === "number" && typeof err[1]
+        ) {
+          return errorCode(err[0], err[1]);
+        }
       }
-      return {
-        error: `Unknown value in check: ${version}`,
-      };
-    } catch (e) {
-      effects.error(`Health check failed: ${e}`);
-      return errorCode(61, "Health check has never run");
+      return ok;
+    } catch (_e) {
+      try {
+        await guardDurationAboveMinimum({
+          duration: lastCall,
+          minimumTime: 10000,
+        });
+      } catch (e2) {
+        dealWithError(e2);
+      }
     }
+    return error("Could not get the current status");
   },
   "web-ui"(effects, lastCall) {
     return effects
@@ -200,10 +192,11 @@ export const health: T.ExpectedExports.health = {
       .then((x) =>
         matches.shape({ username: matches.string, password: matches.string })
           .unsafeCast(x)
-      ).then((config) =>
+      )
+      .then((config) =>
         effects.fetch("http://syncthing.embassy:8384", {
           headers: {
-            "Authorization": `Basic ${
+            Authorization: `Basic ${
               Base64.encode(`${config.username}:${config.password}`)
             }`,
           },
@@ -212,18 +205,23 @@ export const health: T.ExpectedExports.health = {
       .then((webResponse) =>
         // deno-fmt-ignore
         // prettier-fmt-ignore
-        webResponse.status === 401 ? error(`Authorization issue`) :
-          webResponse.status !== 200 ? error(`Could not fetch site`) :
-            ok
+        webResponse.status === 401
+          ? error(`Authorization issue`)
+          : webResponse.status !== 200
+          ? error(`Could not fetch site`)
+          : ok
       )
       .catch((e) =>
         guardDurationAboveMinimum({
           duration: lastCall,
           minimumTime: 10000,
-        }).then((_) => {
-          effects.error(`Health check failed: ${e}`);
-          return errorCode(61, "Health check has never ran");
-        }, (_) => e)
+        }).then(
+          (_) => {
+            effects.error(`Health check failed: ${e}`);
+            return errorCode(61, "Health check has never ran");
+          },
+          (_) => e,
+        )
       );
   },
 };
