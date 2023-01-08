@@ -1,4 +1,4 @@
-import { compat, matches, types as T } from "../deps.ts";
+import { compat, types as T } from "../deps.ts";
 
 export const migration: T.ExpectedExports.migration = compat.migrations
   .fromMapping({
@@ -19,4 +19,4 @@ export const migration: T.ExpectedExports.migration = compat.migrations
         { version: "1.22.1.1", type: "down" },
       ),
     }
-  }, "1.22.1.1");
+  }, "1.23.0");

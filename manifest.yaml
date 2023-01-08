@@ -102,18 +102,13 @@ marketing-site: https://syncthing.org/
 properties:
   type: script
 release-notes: |
-  * https://github.com/syncthing/syncthing/releases/v1.22.1
-  * https://github.com/syncthing/syncthing/releases/v1.22.0
-  * https://github.com/syncthing/syncthing/releases/v1.21.0
-  * https://github.com/syncthing/syncthing/releases/v1.20.4
-  * https://github.com/syncthing/syncthing/releases/v1.20.3
+  * https://github.com/syncthing/syncthing/releases/v1.23.0
+  * https://github.com/syncthing/syncthing/releases/v1.22.2
 support-site: https://github.com/syncthing/syncthing/issues
 title: Syncthing
 upstream-repo: https://github.com/syncthing/syncthing
-version: 1.22.1.1
+version: 1.23.0
 volumes:
-  compat:
-    type: assets
   filebrowser:
     package-id: filebrowser
     path: data
