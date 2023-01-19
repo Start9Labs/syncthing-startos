@@ -2,33 +2,9 @@ actions: {}
 alerts: {}
 backup:
   create:
-    args:
-      - duplicity
-      - create
-      - /mnt/backup
-      - /root/data
-    entrypoint: compat
-    image: compat
-    io-format: yaml
-    mounts:
-      BACKUP: /mnt/backup
-      main: /root/data
-    system: true
-    type: docker
+    type: script
   restore:
-    args:
-      - duplicity
-      - restore
-      - /mnt/backup
-      - /root/data
-    entrypoint: compat
-    image: compat
-    io-format: yaml
-    mounts:
-      BACKUP: /mnt/backup
-      main: /root/data
-    system: true
-    type: docker
+    type: script
 build:
   - make
 config:
@@ -102,12 +78,11 @@ marketing-site: https://syncthing.org/
 properties:
   type: script
 release-notes: |
-  * https://github.com/syncthing/syncthing/releases/v1.23.0
-  * https://github.com/syncthing/syncthing/releases/v1.22.2
+  * Use new eOS APIs for backups
 support-site: https://github.com/syncthing/syncthing/issues
 title: Syncthing
 upstream-repo: https://github.com/syncthing/syncthing
-version: 1.23.0
+version: 1.23.0.1
 volumes:
   filebrowser:
     package-id: filebrowser
