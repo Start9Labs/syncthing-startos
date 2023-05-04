@@ -3,6 +3,7 @@ import { WrapperData } from '../../wrapperData'
 import { Save } from '@start9labs/start-sdk/lib/config/setupConfig'
 import { Manifest } from '../../manifest'
 import fs from 'fs'
+import { passwordFile } from './fileHelpers/passwordFile'
 
 /**
  * This function executes on config save
@@ -24,9 +25,10 @@ export const save: Save<WrapperData, ConfigSpec, Manifest> = async ({
     },
   })
   if (newPassword) {
-    fs.writeFileSync('/root/.password', newPassword)
+    await passwordFile.write(newPassword, effects)
   }
-  await utils.setOwnWrapperData('/config', { ...input, password: null })
+  const { password, username } = input
+  await utils.setOwnWrapperData('/config', { username })
   const dependenciesReceipt = await effects.setDependencies([
     dependencies.exists('filebrowser'),
   ])

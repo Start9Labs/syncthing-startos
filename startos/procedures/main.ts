@@ -8,6 +8,7 @@ import { healthCheck } from '@start9labs/start-sdk/lib/health/HealthCheck'
 import { HealthReceipt } from '@start9labs/start-sdk/lib/health/HealthReceipt'
 import { Daemons } from '@start9labs/start-sdk/lib/mainFn/Daemons'
 import { matches } from '@start9labs/start-sdk/lib'
+import { passwordFile } from './config/fileHelpers/passwordFile'
 
 const { string, object } = matches
 
@@ -149,9 +150,9 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
             { env },
           )
           await effects.runCommand(
-            `syncthing cli config gui password set -- ${await utils
-              .getOwnWrapperData('/config/password')
-              .const()}`,
+            `syncthing cli config gui password set -- ${await passwordFile.read(
+              effects,
+            )}`,
             { env },
           )
           await effects.runCommand(
@@ -184,9 +185,7 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
           const username = await utils
             .getOwnWrapperData('/config/username')
             .const()
-          const password = await utils
-            .getOwnWrapperData('/config/password')
-            .const()
+          const password = await passwordFile.read(effects)
           await effects.fetch(`http://${username}:${password}@localhost:8384/`)
           return {
             status: 'passing',
