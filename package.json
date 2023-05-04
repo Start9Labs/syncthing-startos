@@ -1,0 +1,22 @@
+{
+  "scripts": {
+    "build": "ncc build procedures/index.ts -o ./",
+    "prettier": "prettier --write startos",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@start9labs/start-sdk": "git+https://github.com/start9labs/start-sdk.git#e68b4b76527eed3eb04a869d90a3123434268155",
+    "filebrowser": "git+https://github.com/start9labs/filebrowser-wrapper.git#update/040"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.36.1",
+    "prettier": "^2.8.4",
+    "typescript": "^4.9.5"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true
+  }
+}
