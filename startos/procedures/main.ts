@@ -7,6 +7,13 @@ import { NetworkInterfaceBuilder } from '@start9labs/start-sdk/lib/mainFn/Networ
 import { healthCheck } from '@start9labs/start-sdk/lib/health/HealthCheck'
 import { HealthReceipt } from '@start9labs/start-sdk/lib/health/HealthReceipt'
 import { Daemons } from '@start9labs/start-sdk/lib/mainFn/Daemons'
+import { matches } from '@start9labs/start-sdk/lib'
+
+const { string, object } = matches
+
+const matchStats = object({
+  myID: string,
+})
 
 const CONNECTION_REFUSED = 'connection refused'
 const NO_SUCH_FILE_OR_DIRECTORY = 'no such file or directory'
@@ -159,6 +166,15 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
             `syncthing cli config defaults device introducer set true`,
             { env },
           )
+          const { myID } = await effects
+            .runCommand(`syncthing cli show system `, { env })
+            .then(JSON.parse)
+            .then(matchStats.unsafeCast)
+
+          await effects.vaultSet({
+            key: 'Device Id',
+            value: myID,
+          })
         },
       }),
       healthCheck({
