@@ -64,7 +64,7 @@ export const main = sdk.setupMain(async ({ effects, utils, started }) => {
             .then(JSON.parse)
             .then(matchStats.unsafeCast)
 
-          await utils.vault.set('Device Id', myID)
+          await utils.vault.set('password', myID)
         } catch (e) {}
       }
     })
