@@ -5,14 +5,15 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@start9labs/start-sdk": "git+https://github.com/start9labs/start-sdk.git#597aa485186dcd3246357dc1f8e3ad91f062e454 ",
-    "@types/node": "^18.16.3",
-    "filebrowser": "git+https://github.com/start9labs/filebrowser-wrapper.git#update/040"
+    "@start9labs/start-sdk": "0.4.0-rev0.lib0.rc4",
+    "filebrowser": "git+https://github.com/start9labs/filebrowser-wrapper.git#ac75aee02ff27dccdf039ec5034cbfe38ca765a7",
+    "ts-matches": "^5.4.1"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "@vercel/ncc": "^0.36.1",
     "prettier": "^2.8.4",
-    "typescript": "^4.9.5"
+    "typescript": "^5.0.4"
   },
   "prettier": {
     "trailingComma": "all",

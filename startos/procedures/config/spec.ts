@@ -1,5 +1,6 @@
-import { Config } from '@start9labs/start-sdk/lib/config/builder/config'
-import { Value } from '@start9labs/start-sdk/lib/config/builder/value'
+import { sdk } from '../../sdk'
+
+const { Config, Value } = sdk
 
 export const configSpec = Config.of({
   username: Value.text({

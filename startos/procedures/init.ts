@@ -1,13 +1,11 @@
-import { setupInstall } from '@start9labs/start-sdk/lib/inits/setupInstall'
-import { WrapperData } from '../wrapperData'
 import { migrations } from './migrations'
-import { setupUninstall } from '@start9labs/start-sdk/lib/inits/setupUninstall'
-import { setupInit } from '@start9labs/start-sdk/lib/inits/setupInit'
+import { sdk } from '../sdk'
+import { setInterfaces } from './interfaces'
 
 /**
  * Here you define arbitrary code that runs once, on fresh install only
  */
-const install = setupInstall<WrapperData>(async ({ effects, utils }) => {
+const install = sdk.setupInstall(async ({ effects, utils }) => {
   await effects.runCommand('mkdir /mnt/filebrowser/syncthing')
   await effects.runCommand('chown -R syncthing_user /mnt/filebrowser/syncthing')
 })
@@ -15,9 +13,14 @@ const install = setupInstall<WrapperData>(async ({ effects, utils }) => {
 /**
  * Here you define arbitrary code that runs once, on uninstall only
  */
-const uninstall = setupUninstall<WrapperData>(async ({ effects, utils }) => {})
+const uninstall = sdk.setupUninstall(async ({ effects, utils }) => {})
 
 /**
  * This is a static function. There is no need to make changes here
  */
-export const { init, uninit } = setupInit(migrations, install, uninstall)
+export const { init, uninit } = sdk.setupInit(
+  migrations,
+  install,
+  uninstall,
+  setInterfaces,
+)

@@ -1,5 +1,4 @@
 import { setupManifest } from '@start9labs/start-sdk/lib/manifest/setupManifest'
-import { actionsMetadata } from './procedures/actions'
 
 /**
  * In this function you define static properties of the service
@@ -33,7 +32,7 @@ export const manifest = setupManifest({
   wrapperRepo: 'https://github.com/Start9Labs/syncthing-wrapper',
   volumes: {
     main: 'data',
-    'file-browser': '/mnt/filebrowser',
+    'file-browser': 'data',
   },
   containers: {
     main: {
@@ -48,7 +47,6 @@ export const manifest = setupManifest({
       },
     },
   },
-  actions: actionsMetadata,
   alerts: {
     install: null,
     uninstall: null,
