@@ -1,4 +1,4 @@
-import { configSpec } from './spec'
+import { PASSWORD_GENERATOR, configSpec } from './spec'
 import { passwordFile } from './fileHelpers/passwordFile'
 import { sdk } from '../../sdk'
 import { setInterfaces } from '../interfaces'
@@ -14,10 +14,7 @@ export const save = sdk.setupConfigSave(
     const newPassword = await utils.createOrUpdateVault({
       key: 'password',
       value: input.password,
-      generator: {
-        charset: 'a-z,A-Z,0-9',
-        len: 22,
-      },
+      generator: PASSWORD_GENERATOR,
     })
     if (newPassword) {
       await passwordFile.write(newPassword, effects)

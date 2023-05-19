@@ -1,7 +1,10 @@
 import { sdk } from '../../sdk'
 
 const { Config, Value } = sdk
-
+export const PASSWORD_GENERATOR = {
+  charset: 'a-z,A-Z,0-9',
+  len: 22,
+} as const
 export const configSpec = Config.of({
   username: Value.text({
     name: 'Username',
@@ -21,10 +24,7 @@ export const configSpec = Config.of({
   password: Value.text({
     name: 'Password',
     required: false,
-    generate: {
-      charset: 'a-z,A-Z,0-9',
-      len: 22,
-    },
+    generate: PASSWORD_GENERATOR,
     description:
       'The password for loging into the administration page of syncthing',
     warning: null,
