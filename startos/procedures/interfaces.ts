@@ -24,6 +24,8 @@ export const setInterfaces = sdk.setupInterfaces(
       username: null,
       path: '',
       search: {},
+      disabled: false,
+      hasPrimary: true,
     })
 
     const multiReceipt = await multiInterface.export([multiOrigin])

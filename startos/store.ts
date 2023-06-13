@@ -5,7 +5,8 @@ import { ConfigSpec } from './procedures/config/spec'
  *
  * It is conventional for the "config" key to store the service's saved config, excluding sensitive data like passwords
  */
-export interface Store {
+export type Store = {
+  password: string
   config: {
     username: string
   }

@@ -6,8 +6,26 @@ import { setInterfaces } from './interfaces'
  * Here you define arbitrary code that runs once, on fresh install only
  */
 const install = sdk.setupInstall(async ({ effects, utils }) => {
-  await effects.runCommand('mkdir /mnt/filebrowser/syncthing')
-  await effects.runCommand('chown -R syncthing_user /mnt/filebrowser/syncthing')
+  await utils.childProcess.exec('mkdir /mnt/filebrowser/syncthing')
+  await utils.childProcess.exec(
+    'chown -R syncthing_user /mnt/filebrowser/syncthing',
+  )
+})
+
+const setupExports = sdk.setupExports(({ effects, utils }) => {
+  return {
+    ui: [
+      {
+        path: '/config/username',
+        title: 'Username',
+      },
+      {
+        path: '/password',
+        title: 'Password',
+      },
+    ],
+    services: [],
+  }
 })
 
 /**
@@ -23,4 +41,5 @@ export const { init, uninit } = sdk.setupInit(
   install,
   uninstall,
   setInterfaces,
+  setupExports,
 )

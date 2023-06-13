@@ -5,8 +5,8 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@start9labs/start-sdk": "0.4.0-rev0.lib0.rc4",
-    "filebrowser": "git+https://github.com/start9labs/filebrowser-wrapper.git#ac75aee02ff27dccdf039ec5034cbfe38ca765a7",
+    "@start9labs/start-sdk": "0.4.0-rev0.lib0.rc7",
+    "filebrowser": "git+https://github.com/start9labs/filebrowser-wrapper.git#32e05d3d2157038b099329c11453b00d29ccca78",
     "ts-matches": "^5.4.1"
   },
   "devDependencies": {

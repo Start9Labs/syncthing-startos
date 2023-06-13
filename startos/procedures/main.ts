@@ -14,11 +14,13 @@ export const main = sdk.setupMain(async ({ effects, utils, started }) => {
   function setupSettingLoop(env: { HOME: string }) {
     new Promise(async () => {
       while (true) {
-        const showSystem = await effects
-          .runCommand('syncthing cli show system', { env })
+        const showSystem = await utils.childProcess
+          .exec('syncthing cli show system', { env })
+          .then((x) => x.stdout)
           .catch(() => CONNECTION_REFUSED)
-        const userGet = await effects
-          .runCommand('syncthing cli config gui user get', { env })
+        const userGet = await utils.childProcess
+          .exec('syncthing cli config gui user get', { env })
+          .then((x) => x.stdout)
           .catch(() => '')
         if (
           showSystem.indexOf(NO_SUCH_FILE_OR_DIRECTORY) > -1 ||
@@ -31,40 +33,41 @@ export const main = sdk.setupMain(async ({ effects, utils, started }) => {
       }
       while (true) {
         try {
-          await effects.runCommand(
+          await utils.childProcess.exec(
             `syncthing cli config gui raw-address set -- 0.0.0.0:8384`,
             { env },
           )
-          await effects.runCommand(
+          await utils.childProcess.exec(
             `syncthing cli config gui user set -- ${await utils.store
               .getOwn('/config/username')
               .const()}`,
             { env },
           )
-          await effects.runCommand(
+          await utils.childProcess.exec(
             `syncthing cli config gui password set -- ${await passwordFile.read(
               effects,
             )}`,
             { env },
           )
-          await effects.runCommand(
+          await utils.childProcess.exec(
             `syncthing cli config options uraccepted set -- -1`,
             { env },
           )
-          await effects.runCommand(
+          await utils.childProcess.exec(
             `syncthing cli config defaults device auto-accept-folders set true`,
             { env },
           )
-          await effects.runCommand(
+          await utils.childProcess.exec(
             `syncthing cli config defaults device introducer set true`,
             { env },
           )
-          const { myID } = await effects
-            .runCommand(`syncthing cli show system `, { env })
+          const { myID } = await utils.childProcess
+            .exec(`syncthing cli show system `, { env })
+            .then((x) => x.stdout)
             .then(JSON.parse)
             .then(matchStats.unsafeCast)
 
-          await utils.vault.set('password', myID)
+          await utils.store.setOwn('/password', myID)
         } catch (e) {}
       }
     })
@@ -81,7 +84,7 @@ export const main = sdk.setupMain(async ({ effects, utils, started }) => {
   }
 
   setInterval(async () => {
-    await effects.runCommand(
+    await utils.childProcess.exec(
       'chown -R syncthing_user /mnt/filebrowser/syncthing',
     )
   }, 10_000)
@@ -93,13 +96,13 @@ export const main = sdk.setupMain(async ({ effects, utils, started }) => {
    */
   await setupSettingLoop(env)
   const healthReceipts = [
-    sdk.healthCheck.of({
+    sdk.HealthCheck.of({
       name: 'Syncthing Web UI Reachable',
       effects,
       fn: async () => {
         const username = await utils.store.getOwn('/config/username').const()
         const password = await passwordFile.read(effects)
-        await effects.fetch(`http://${username}:${password}@localhost:8384/`)
+        await fetch(`http://${username}:${password}@localhost:8384/`)
         return {
           status: 'passing',
         }
