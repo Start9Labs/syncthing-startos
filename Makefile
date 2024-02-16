@@ -9,11 +9,11 @@ DOCKER_FILES := $(shell find docker_files)
 all: verify
 
 verify: $(PKG_ID).s9pk
-	embassy-sdk verify s9pk $(PKG_ID).s9pk
+	start-sdk verify s9pk $(PKG_ID).s9pk
 
-# assumes /etc/embassy/config.yaml exists on local system with `host: "http://embassy-server-name.local"` configured
+# assumes /etc/embassy/config.yaml exists on local system with `host: "http://start-server-name.local"` configured
 install: $(PKG_ID).s9pk
-	embassy-cli package install $(PKG_ID).s9pk
+	start-cli package install $(PKG_ID).s9pk
 
 clean:
 	rm -rf docker-images
@@ -34,4 +34,4 @@ docker-images/x86_64.tar: Dockerfile   $(DOCKER_FILES) manifest.yaml
 
 
 $(PKG_ID).s9pk: manifest.yaml INSTRUCTIONS.md icon.png LICENSE.md scripts/embassy.js docker-images/aarch64.tar docker-images/x86_64.tar
-	embassy-sdk pack
+	start-sdk pack
