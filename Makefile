@@ -9,29 +9,57 @@ DOCKER_FILES := $(shell find docker_files)
 all: verify
 
 verify: $(PKG_ID).s9pk
-	start-sdk verify s9pk $(PKG_ID).s9pk
+	@start-sdk verify s9pk $(PKG_ID).s9pk
+	@echo " Done!"
+	@echo "   Filesize: $(shell du -h $(PKG_ID).s9pk) is ready"
 
-# assumes /etc/embassy/config.yaml exists on local system with `host: "http://start-server-name.local"` configured
-install: $(PKG_ID).s9pk
+install:
+ifeq (,$(wildcard ~/.embassy/config.yaml))
+	@echo; echo "You must define \"host: http://server-name.local\" in ~/.embassy/config.yaml config file first"; echo
+else
 	start-cli package install $(PKG_ID).s9pk
+endif
 
 clean:
 	rm -rf docker-images
-	rm -f image.tar
 	rm -f $(PKG_ID).s9pk
 	rm -f scripts/*.js
+
+clean-manifest:
+	@sed -i '' '/^[[:blank:]]*#/d' manifest.yaml
+	@echo; echo "Comments successfully removed from manifest.yaml file."; echo
 
 scripts/embassy.js: $(TS_FILES)
 	deno bundle scripts/embassy.ts scripts/embassy.js
 
-docker-images/aarch64.tar: Dockerfile  $(DOCKER_FILES) manifest.yaml
-	mkdir -p docker-images
-	docker buildx build --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --build-arg ARCH=aarch64 --build-arg PLATFORM=arm64 --platform=linux/arm64/v8 -o type=docker,dest=docker-images/aarch64.tar .
+arm:
+	@rm -f docker-images/x86_64.tar
+	ARCH=aarch64 $(MAKE)
 
-docker-images/x86_64.tar: Dockerfile   $(DOCKER_FILES) manifest.yaml
-	mkdir -p docker-images
-	docker buildx build --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --build-arg ARCH=x86_64 --build-arg PLATFORM=amd64 --platform=linux/amd64 -o type=docker,dest=docker-images/x86_64.tar .
+x86:
+	@rm -f docker-images/aarch64.tar
+	ARCH=x86_64 $(MAKE)
 
+docker-images/aarch64.tar: Dockerfile $(DOCKER_FILES)
+ifeq ($(ARCH),x86_64)
+else
+	mkdir -p docker-images
+	docker buildx build --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --platform=linux/arm64 -o type=docker,dest=docker-images/aarch64.tar .
+endif
+
+docker-images/x86_64.tar: Dockerfile $(DOCKER_FILES)
+ifeq ($(ARCH),aarch64)
+else
+	mkdir -p docker-images
+	docker buildx build --tag start9/$(PKG_ID)/main:$(PKG_VERSION) --platform=linux/amd64 -o type=docker,dest=docker-images/x86_64.tar .
+endif
 
 $(PKG_ID).s9pk: manifest.yaml INSTRUCTIONS.md icon.png LICENSE.md scripts/embassy.js docker-images/aarch64.tar docker-images/x86_64.tar
-	start-sdk pack
+ifeq ($(ARCH),aarch64)
+	@echo "start-sdk: Preparing aarch64 package ..."
+else ifeq ($(ARCH),x86_64)
+	@echo "start-sdk: Preparing x86_64 package ..."
+else
+	@echo "start-sdk: Preparing Universal Package ..."
+endif
+	@start-sdk pack
