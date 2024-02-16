@@ -12,6 +12,8 @@ RUN adduser --disabled-password syncthing_user
 COPY docker_files/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker_files/* /usr/bin
 
+ENV STGUIADDRESS=0.0.0.0:8384
+
 EXPOSE 8384/tcp
 EXPOSE 22000/tcp
 
