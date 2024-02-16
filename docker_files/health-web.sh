@@ -11,7 +11,7 @@ check_web(){
         echo "Ok: Web interface is reachable" > /root/health-web
     fi
 }
-echo 'runing check web'
+echo 'running check web'
 while true ; do
     check_web
     sleep 60
