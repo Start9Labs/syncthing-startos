@@ -8,11 +8,12 @@ i=0
 
 rm /root/health-web
 rm /root/health-version
-mkdir /mnt/filebrowser/syncthing
+mkdir -p /mnt/filebrowser/syncthing
 chown -R syncthing_user /mnt/filebrowser/syncthing
-su -s /bin/sh -c "HOME=/mnt/filebrowser/syncthing syncthing serve --no-restart --reset-deltas --no-default-folder" syncthing_user &
+export HOME="/mnt/filebrowser/syncthing"
+export STHOMEDIR="/mnt/filebrowser/syncthing/.local/state/syncthing"
+su -s /bin/sh -c "syncthing serve --no-restart --reset-deltas --no-default-folder" syncthing_user &
 syncthing_process=$!
-export HOME=/mnt/filebrowser/syncthing
 
 while [[ "$(syncthing cli show system)" =~ 'no such file or directory' ]] || [[ "$(syncthing cli show system)" =~ 'connection refused' ]] || [[ "$(syncthing cli config gui user get)" =~ 'connection refused' ]]; do
   sleep .2
