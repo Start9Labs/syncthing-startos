@@ -2,7 +2,7 @@ id: syncthing
 title: Syncthing
 version: 1.27.3
 release-notes: |
-  * Upstream code updated to v1.27.3 - [full changelog](https://github.com/Start9Labs/syncthing/compare/v1.23.0...v1.27.3)
+  * Upstream code updated to v1.27.3 - ([full changelog](https://github.com/syncthing/syncthing/compare/v1.23.0...v1.27.3))
   * Simplified and optimized build with upstream image
   * Fixes no UI bug when "Use HTTPS for GUI" enabled
   * Standardized and optimized icon
