@@ -11,7 +11,7 @@ rm /root/health-version
 mkdir -p /mnt/filebrowser/syncthing
 chown -R syncthing_user /mnt/filebrowser/syncthing
 export HOME="/mnt/filebrowser/syncthing"
-export STHOMEDIR="/mnt/filebrowser/syncthing/.local/state/syncthing"
+export STHOMEDIR="/mnt/filebrowser/syncthing/.config/syncthing"
 su -s /bin/sh -c "syncthing serve --no-restart --reset-deltas --no-default-folder" syncthing_user &
 syncthing_process=$!
 # wait to fix properties race condition
