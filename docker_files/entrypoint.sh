@@ -14,6 +14,8 @@ export HOME="/mnt/filebrowser/syncthing"
 export STHOMEDIR="/mnt/filebrowser/syncthing/.local/state/syncthing"
 su -s /bin/sh -c "syncthing serve --no-restart --reset-deltas --no-default-folder" syncthing_user &
 syncthing_process=$!
+# wait to fix properties race condition
+sleep 2
 
 while [[ "$(syncthing cli show system)" =~ 'no such file or directory' ]] || [[ "$(syncthing cli show system)" =~ 'connection refused' ]] || [[ "$(syncthing cli config gui user get)" =~ 'connection refused' ]]; do
   sleep .2
