@@ -1,29 +1,37 @@
-actions: {}
-alerts: {}
-backup:
-  create:
-    type: script
-  restore:
-    type: script
-build:
-  - make
-config:
-  get:
-    type: script
-  set:
-    type: script
-dependencies:
-  filebrowser:
-    config: null
-    description: Used to store persisted data for Syncthing
-    requirement:
-      type: required
-    version: ^2.14.1.1
+id: syncthing
+title: Syncthing
+version: 1.27.3
+release-notes: |
+  * Upstream code updated to v1.27.3 - ([full changelog](https://github.com/syncthing/syncthing/compare/v1.23.0...v1.27.3))
+  * Simplified and optimized build with upstream image
+  * Fixes no UI bug when "Use HTTPS for GUI" enabled
+  * Standardized and optimized icon
+  * Instructions update
+  * Declare proper license 
+  * Other bugfixes and code cleanup
+license: MPL-2.0
+wrapper-repo: "https://github.com/Start9Labs/syncthing-startos"
+upstream-repo: "https://github.com/syncthing/syncthing"
+support-site: "https://github.com/syncthing/syncthing/issues"
+marketing-site: "https://syncthing.net/"
+donation-url: "https://syncthing.net/donations/"
 description:
+  short: Synchronizes files between devices in real time, safely protected from prying eyes
   long: |
     Syncthing provides a simple file managing and synchronization interface which can be used to upload, download, organize, edit, and share your files across multiple devices.
-  short: Synchronizes files between devices in real time, safely protected from prying eyes
-donation-url: https://syncthing.net/donations/
+build: ["make"]
+assets:
+  icon: icon.png
+  license: LICENSE.md
+  instructions: INSTRUCTIONS.md
+main:
+  type: docker
+  image: main
+  entrypoint: tini
+  args: ["entrypoint.sh"]
+  mounts:
+    main: /root
+    filebrowser: /mnt/filebrowser
 health-checks:
   version:
     name: Sync Connection
@@ -33,29 +41,44 @@ health-checks:
     name: Web Interface
     success-message: Syncthing is ready to be visited in your browser.
     type: script
-id: syncthing
+config:
+  get:
+    type: script
+  set:
+    type: script
+properties:
+  type: script
+volumes:
+  main:
+    type: data
+  filebrowser:
+    package-id: filebrowser
+    path: data
+    readonly: false
+    type: pointer
+    volume-id: main
 interfaces:
   main:
+    name: Syncthing UI
     description: The user interface to configure, customize, and interact with Syncthing
+    tor-config:
+      port-mapping:
+        "80": "8384"
     lan-config:
       "443":
         internal: 8384
         ssl: true
-    name: Syncthing UI
+    ui: true
     protocols:
       - tcp
       - http
-    tor-config:
-      port-mapping:
-        "80": "8384"
-    ui: true
   sync-listening:
+    name: Listening Port
     description: Listening Port
     lan-config:
       "22000":
         internal: 22000
         ssl: false
-    name: Listening Port
     protocols:
       - tcp
       - http
@@ -64,35 +87,20 @@ interfaces:
       port-mapping:
         "22000": "22000"
     ui: false
-license: apache
-main:
-  args:
-    - entrypoint.sh
-  entrypoint: tini
-  image: main
-  mounts:
-    filebrowser: /mnt/filebrowser
-    main: /root
-  type: docker
-marketing-site: https://syncthing.org/
-properties:
-  type: script
-release-notes: |
-  * Use new eOS APIs for backups
-support-site: https://github.com/syncthing/syncthing/issues
-title: Syncthing
-upstream-repo: https://github.com/syncthing/syncthing
-version: 1.23.0.1
-volumes:
+dependencies:
   filebrowser:
-    package-id: filebrowser
-    path: data
-    readonly: false
-    type: pointer
-    volume-id: main
-  main:
-    type: data
-wrapper-repo: https://github.com/Start9Labs/syncthing-wrapper
+    config: null
+    description: Used to store persisted data for Syncthing
+    requirement:
+      type: required
+    version: ^2.14.1.1
+actions: {}
+alerts: {}
+backup:
+  create:
+    type: script
+  restore:
+    type: script
 migrations:
   from:
     "*":

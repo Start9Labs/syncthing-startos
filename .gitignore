@@ -1,7 +1,4 @@
-image.tar
-syncthing.s9pk
-**/node_modules/
-makeStats
+*.s9pk
 scripts/embassy.js
 .DS_Store
 .vscode/
