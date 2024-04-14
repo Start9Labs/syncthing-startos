@@ -49,6 +49,37 @@ done
 
 syncthing cli show system > /root/syncthing_stats.json
 
+SU=$(yq '.username' /root/start9/config.yaml)
+SP=$(yq '.password' /root/start9/config.yaml)
+DID=$(yq -oy '.myID' /root/syncthing_stats.json)
+
+cat << BTC > /root/start9/stats.yaml
+---
+version: 2
+data:
+  Device ID:
+    type: string
+    value: $DID
+    description: This is the ID for syncthing to attach others to this device.
+    copyable: true
+    qr: false
+    masked: false
+  Username:
+    type: string
+    value: $SU
+    description: Username to login to the UI.
+    copyable: true
+    qr: false
+    masked: false
+  Password:
+    type: string
+    value: $SP
+    description: Password to login to the UI.
+    copyable: true
+    qr: false
+    masked: true
+BTC
+
 watch-and-own.sh &
 
 health-version.sh &

@@ -1,14 +1,11 @@
 id: syncthing
 title: Syncthing
-version: 1.27.3
+version: 1.27.6
 release-notes: |
-  * Upstream code updated to v1.27.3 - ([full changelog](https://github.com/syncthing/syncthing/compare/v1.23.0...v1.27.3))
-  * Simplified and optimized build with upstream image
-  * Fixes no UI bug when "Use HTTPS for GUI" enabled
-  * Standardized and optimized icon
-  * Instructions update
-  * Declare proper license 
-  * Other bugfixes and code cleanup
+  * Upstream code updated - ([full changelog](https://github.com/syncthing/syncthing/compare/v1.27.3...v1.27.6))
+  * Use duplicity for backups
+  * Fix properties rendering
+  * Other bugfixes
 license: MPL-2.0
 wrapper-repo: "https://github.com/Start9Labs/syncthing-startos"
 upstream-repo: "https://github.com/syncthing/syncthing"
