@@ -95,9 +95,33 @@ actions: {}
 alerts: {}
 backup:
   create:
-    type: script
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - create
+      - /mnt/backup
+      - /root
+    mounts:
+      BACKUP: /mnt/backup
+      main: /root
+    io-format: yaml
   restore:
-    type: script
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - restore
+      - /mnt/backup
+      - /root
+    mounts:
+      BACKUP: /mnt/backup
+      main: /root
+    io-format: yaml
 migrations:
   from:
     "*":
