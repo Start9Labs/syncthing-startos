@@ -27,7 +27,7 @@ main:
   entrypoint: tini
   args: ["entrypoint.sh"]
   mounts:
-    main: /root
+    main: /root/data
     filebrowser: /mnt/filebrowser
 health-checks:
   version:
@@ -103,11 +103,10 @@ backup:
       - duplicity
       - create
       - /mnt/backup
-      - /root
+      - /root/data
     mounts:
-      BACKUP: /mnt/backup
-      main: /root
-    io-format: yaml
+      BACKUP: "/mnt/backup"
+      main: "/root/data"
   restore:
     type: docker
     image: compat
@@ -117,11 +116,10 @@ backup:
       - duplicity
       - restore
       - /mnt/backup
-      - /root
+      - /root/data
     mounts:
-      BACKUP: /mnt/backup
-      main: /root
-    io-format: yaml
+      BACKUP: "/mnt/backup"
+      main: "/root/data"
 migrations:
   from:
     "*":

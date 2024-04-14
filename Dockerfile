@@ -1,4 +1,4 @@
-FROM syncthing/syncthing:1.27.3 AS build
+FROM syncthing/syncthing:1.27.6 AS build
 
 RUN apk add --no-cache curl jq tini inotify-tools yq && \
     rm -rf /var/cache/apk/*
