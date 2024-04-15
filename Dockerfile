@@ -1,6 +1,6 @@
 FROM syncthing/syncthing:1.27.6 AS build
 
-RUN apk add --no-cache curl jq tini inotify-tools yq && \
+RUN apk add --no-cache curl tini inotify-tools yq && \
     rm -rf /var/cache/apk/*
 
 RUN adduser --disabled-password syncthing_user

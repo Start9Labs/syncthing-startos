@@ -1,57 +1,30 @@
 #!/bin/sh
+
+printf "\n\n [i] Starting Syncthing ...\n\n"
+
 if ! test -d /mnt/filebrowser
 then
   exit 0
 fi
 
-i=0
-
-rm /root/data/health-web
-rm /root/data/health-version
-mkdir -p /mnt/filebrowser/syncthing
-chown -R syncthing_user /mnt/filebrowser/syncthing
+rm -f /root/data/health-web
+rm -f /root/data/health-version
 export HOME="/mnt/filebrowser/syncthing"
 export STHOMEDIR="/mnt/filebrowser/syncthing/.config/syncthing"
-su -s /bin/sh -c "syncthing serve --no-restart --reset-deltas --no-default-folder" syncthing_user &
-syncthing_process=$!
-# wait to fix properties race condition
-sleep 2
-
-while [[ "$(syncthing cli show system)" =~ 'no such file or directory' ]] || [[ "$(syncthing cli show system)" =~ 'connection refused' ]] || [[ "$(syncthing cli config gui user get)" =~ 'connection refused' ]]; do
-  sleep .2
-  echo "I'm sleeping"
-  echo "COUNT is $i"
-  i=$(expr $i + 1)
-  if test $i -gt 200
-  then
-    exit 1
-  fi
-done
-echo "Syncthing Settings"
-sleep .1
-syncthing cli config gui raw-address set -- 0.0.0.0:8384
-syncthing cli config gui user set -- $(yq e '.username' /root/data/start9/config.yaml)
-syncthing cli config gui password set -- $(yq e '.password' /root/data/start9/config.yaml)
-syncthing cli config options uraccepted set -- -1
-syncthing cli config defaults device auto-accept-folders set true
-syncthing cli config defaults device introducer set true
-
-while [[ "$(syncthing cli show system)" =~ 'no such file or directory' ]] || [[ "$(syncthing cli show system)" =~ 'connection refused' ]] || [[ "$(syncthing cli config gui user get)" =~ 'connection refused' ]]; do
-  sleep .2
-  echo "I'm sleeping"
-  echo "COUNT is $i"
-  i=$(expr $i + 1)
-  if test $i -gt 200
-  then
-    exit 1
-  fi
-done
-
-syncthing cli show system > /root/data/syncthing_stats.json
-
 SU=$(yq '.username' /root/data/start9/config.yaml)
 SP=$(yq '.password' /root/data/start9/config.yaml)
-DID=$(yq -oy '.myID' /root/data/syncthing_stats.json)
+ln -s $STHOMEDIR /var/syncthing/config
+mkdir -p $HOME
+chown -R syncthing_user $HOME
+
+su-exec syncthing_user syncthing generate --no-default-folder --no-default-folder --skip-port-probing --gui-user=$SU --gui-password=$SP
+
+echo "Adjusting Syncthing Default Settings"
+yq -i -p xml -o xml '.configuration.options.urAccepted = "-1"' $STHOMEDIR/config.xml
+yq -i -p xml -o xml '.configuration.device.autoAcceptFolders = "true"' $STHOMEDIR/config.xml
+yq -i -p xml -o xml '.configuration.defaults.device.+@introducer = "true"' $STHOMEDIR/config.xml
+
+DID=$(yq -oy '.configuration.device.+@id' $STHOMEDIR/config.xml)
 
 cat << BTC > /root/data/start9/stats.yaml
 ---
@@ -62,7 +35,7 @@ data:
     value: $DID
     description: This is the ID for syncthing to attach others to this device.
     copyable: true
-    qr: false
+    qr: true
     masked: false
   Username:
     type: string
@@ -79,6 +52,9 @@ data:
     qr: false
     masked: true
 BTC
+
+su-exec syncthing_user syncthing serve --no-restart --reset-deltas --no-default-folder &
+syncthing_process=$!
 
 watch-and-own.sh &
 

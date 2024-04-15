@@ -2,7 +2,7 @@
 
 check_web(){
     echo 'Checking web'
-    curl -u $(yq e '.username' /root/data/start9/config.yaml):$(yq e '.password' /root/data/start9/config.yaml) --silent --fail localhost:8384/ &>/dev/null
+    curl --silent --fail localhost:8384/rest/noauth/health &>/dev/null
     RES=$?
     echo RES
     if test "$RES" != 0; then
