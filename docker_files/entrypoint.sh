@@ -17,10 +17,11 @@ ln -s $STHOMEDIR /var/syncthing/config
 mkdir -p $HOME
 chown -R syncthing_user $HOME
 
-su-exec syncthing_user syncthing generate --no-default-folder --no-default-folder --skip-port-probing --gui-user=$SU --gui-password=$SP
+su-exec syncthing_user syncthing generate --no-default-folder --skip-port-probing --gui-user=$SU --gui-password=$SP
 
 echo "Adjusting Syncthing Default Settings"
 yq -i -p xml -o xml '.configuration.options.urAccepted = "-1"' $STHOMEDIR/config.xml
+yq -i -p xml -o xml '.configuration.gui.address = "0.0.0.0:8384"' $STHOMEDIR/config.xml
 yq -i -p xml -o xml '.configuration.device.autoAcceptFolders = "true"' $STHOMEDIR/config.xml
 yq -i -p xml -o xml '.configuration.defaults.device.+@introducer = "true"' $STHOMEDIR/config.xml
 

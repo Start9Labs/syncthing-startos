@@ -3,11 +3,14 @@ FROM syncthing/syncthing:1.27.6 AS build
 RUN apk add --no-cache curl tini inotify-tools yq && \
     rm -rf /var/cache/apk/*
 
+RUN ln -s /mnt/filebrowser/syncthing /home/syncthing_user
 RUN adduser --disabled-password syncthing_user
 
 COPY docker_files/* /usr/local/bin
 
 ENV STGUIADDRESS=0.0.0.0:8384
+ENV HOME="/mnt/filebrowser/syncthing"
+ENV STHOMEDIR="/mnt/filebrowser/syncthing/.config/syncthing"
 
 EXPOSE 8384/tcp
 EXPOSE 22000/tcp
