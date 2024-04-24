@@ -3,8 +3,7 @@ FROM syncthing/syncthing:1.27.6 AS build
 RUN apk add --no-cache curl tini inotify-tools yq && \
     rm -rf /var/cache/apk/*
 
-RUN ln -s /mnt/filebrowser/syncthing /home/syncthing_user
-RUN adduser --disabled-password syncthing_user
+RUN adduser --disabled-password -h /mnt/filebrowser/syncthing syncthing_user
 
 COPY docker_files/* /usr/local/bin
 
