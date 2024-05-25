@@ -5,7 +5,7 @@
 1. Install Syncthing from the Start9 Service Marketplace.
 1. Configure Syncthing. A default username and random password are created for you, but feel free to change either.
 1. Click "Start".
-1. Go into "Properties" and copy your password.
+1. Go into "Config" and copy your password.
 1. When Syncthing health checks show "Success," go ahead and launch the UI. You can use Syncthing on either LAN or Tor.
 1. Enter your username and paste in your password from Properties (above). We recommend saving these credentials on your Vaultwarden Server for secure, easy access later on.
 1. Inside Actions -> Settings, give your device a name. Something like "Bob on Start9".
